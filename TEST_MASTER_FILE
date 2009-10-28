@@ -1,3 +1,4 @@
 for (int a){
-	printf("toto");
+	printf("tata");
+	printf("baba");
 }
