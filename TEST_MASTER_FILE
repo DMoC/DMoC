@@ -1,4 +1,0 @@
-for (int a){
-	printf("tata");
-	printf("caca");
-}
