@@ -23,6 +23,7 @@
  *         Pierre Guironnet de Massas <pierre.guironnet-de-massas@imag.fr>
  *
  */
+
 #ifndef SOC_DIR
 #define SOC_DIR
 
