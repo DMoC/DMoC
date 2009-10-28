@@ -1,0 +1,36 @@
+# -*- python -*-
+
+__id__ = "$Id: vci_dspinplus_initiator_wrapper.sd 917 2009-03-12 10:10:06Z nipo $"
+__version__ = "$Revision: 917 $"
+
+Module('caba:vci_dspinplus_initiator_wrapper_ecmd_sls',
+	classname = 'soclib::caba::VciDspinPlusInitiatorWrapperEcmd',
+	tmpl_parameters = [
+	    parameter.Module('vci_param',  default = 'caba:vci_param'),
+	    parameter.Int('dspin_fifo_size'),
+	    parameter.Int('dspin_yx_size'),
+	],
+	header_files = ['../source/include/vci_dspinplus_initiator_wrapper_ecmd.h',],
+	implementation_files = ['../source/src/vci_dspinplus_initiator_wrapper_ecmd.cpp',],
+	ports = [
+		Port('caba:bit_in', 'p_resetn', auto = 'resetn'),
+		Port('caba:clock_in', 'p_clk', auto = 'clock'),
+	        Port('caba:vci_target', 'p_vci'),
+	        Port('caba:dspin_output', 'p_dspin_out', dspin_data_size = 53),
+	        Port('caba:dspin_input', 'p_dspin_in', dspin_data_size = 49),
+	],
+	instance_parameters = [
+	    parameter.Module('mt', typename = 'common:mapping_table', auto = 'env:mapping_table'),
+	],
+	uses = [
+	    Uses('caba:base_module'),
+	    Uses('common:mapping_table'),
+	    Uses('caba:generic_fifo'),
+	],
+	   extensions = [
+	'dsx:obtain_ident_method=port',
+	'dsx:interconnect',
+	'dsx:mapping_type=interconnect',
+	'dsx:get_ident=srcid:p_dspin_out,tgtid:p_dspin_in',
+	],
+)

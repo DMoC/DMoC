@@ -1,0 +1,8 @@
+bug0:
+
+réception d'une requête à une adresse foireuse (cache inv).
+cause : le program n'a exécuté que de la merde (suite d'instructions 0x00000 ..).
+cause : la LTB contiens une nouvelle translation d'adresse (juste après migration), mais la
+page n'a visiblement pas encore migrée.
+Solution : obligé le noeud éméteur (initiateur de la migration) à poisonner sa page AVANT d'envoyer
+la page sélectionnée.

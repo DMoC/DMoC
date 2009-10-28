@@ -1,0 +1,14 @@
+
+# -*- python -*-
+
+Module('caba:tlb_32_sls',
+	classname = 'soclib::caba::TLB_32',
+	tmpl_parameters = [
+			parameter.Int('addr_bit_width'),
+	],
+	header_files = ['../include/tlb_32.h',],
+	implementation_files = ['../src/tlb_32.cpp',],
+	instance_parameters = [
+	parameter.Int('nb_entries','page_size'),
+	],
+)

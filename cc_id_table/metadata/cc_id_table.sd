@@ -1,0 +1,13 @@
+
+# -*- python -*-
+
+Module('common:cc_id_table_sls',
+	classname = 'soclib::common::CcIdTable',
+	header_files = ['../include/cc_id_table.h',],
+	implementation_files = ['../src/cc_id_table.cpp',],
+	uses = [
+		Uses('common:int_tab'),
+		Uses('common:exception'),
+	],
+)
+

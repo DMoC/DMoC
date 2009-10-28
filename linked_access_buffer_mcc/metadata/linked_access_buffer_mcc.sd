@@ -1,0 +1,12 @@
+
+# -*- python -*-
+
+Module('common:linked_access_buffer_mcc_sls',
+	classname = 'soclib::common::LinkedAccessBuffer_mcc',
+	header_files = ['../include/linked_access_buffer_mcc.h',],
+	implementation_files = ['../src/linked_access_buffer_mcc.cpp',],
+	tmpl_parameters = [
+	parameter.Type('addr_t'),
+	parameter.Type('id_t'),
+	],
+)

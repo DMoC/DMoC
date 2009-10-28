@@ -1,0 +1,30 @@
+
+# -*- python -*-
+
+Module('caba:sram',
+	classname = 'soclib::caba::SRam',
+	tmpl_parameters = [
+	parameter.Module('sram_param',  default = 'caba:sram_param'),
+	],
+	header_files = ['../source/include/sram.h',],
+	implementation_files = [
+			'../source/src/sram.cpp',
+			'../source/src/sram_utils.cpp',
+			'../source/src/sram_mealy.cpp',
+			'../source/src/sram_cdb.cpp',
+			],
+	ports = [
+	],
+	uses = [
+		Uses('caba:base_module'),
+		Uses('caba:sram_param'),
+		],
+		instance_parameters = [
+		parameter.IntTab('t_ident'),
+		parameter.Module('mt', 'common:mapping_table', auto='env:mapping_table'),
+		parameter.Module('loader', 'common:loader', auto='env:loader'),
+		],
+	   extensions = [
+	'dsx:mapping_type=memory',
+   ],
+)

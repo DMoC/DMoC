@@ -1,0 +1,50 @@
+
+# -*- python -*-
+
+Module('caba:cc_ram_core',
+	classname = 'soclib::caba::CcRamCore',
+	tmpl_parameters = [
+	parameter.Module('vci_param',  default = 'caba:vci_param'),
+	parameter.Module('sram_param',  default = 'caba:sram_param'),
+	],
+	header_files = ['../source/include/cc_ram_core.h',],
+	implementation_files = [
+			'../source/src/cc_ram_core.cpp',
+			'../source/src/cc_ram_core_transition.cpp',
+			'../source/src/cc_ram_core_moore.cpp',
+			'../source/src/cc_ram_core_mealy.cpp',
+			'../source/src/cc_ram_core_utils.cpp',
+			'../source/src/cc_ram_core_deprecated.cpp',
+			],
+	ports = [
+	Port('caba:vci_target', 'p_t_vci'),
+	Port('caba:vci_initiator', 'p_i_vci'),
+	Port('caba:bit_in', 'p_resetn', auto = 'resetn'),
+	Port('caba:clock_in', 'p_clk', auto = 'clock'),
+	],
+	uses = [
+		Uses('caba:base_module'),
+		Uses('caba:generic_fifo'),
+		Uses('caba:sram'),
+		Uses('caba:vci_target_fsm_nlock_tlb_sls', default_target = 'true', support_llsc = 'true'),
+		Uses('common:mapping_table'),
+		Uses('common:types_sls'),
+		Uses('common:directory_sls'),
+		Uses('common:loader'),
+		Uses('common:cc_id_table_sls'),
+		Uses('caba:cc_globals_sls'),
+		],
+	instance_parameters = [
+	parameter.IntTab('t_ident'),
+	parameter.IntTab('i_ident'),
+	parameter.Module('mt', 'common:mapping_table', auto='env:mapping_table'),
+	parameter.Module('mt_inv', 'common:mapping_table', auto='env:mapping_table'),
+	parameter.Int('nb_p'),
+	],
+	   extensions = [
+	'dsx:addressable=t_ident',
+	'dsx:get_ident=t_ident:p_t_vci',
+	'dsx:get_ident=i_ident:p_i_vci',
+	'dsx:mapping_type=memory',
+   ],
+)

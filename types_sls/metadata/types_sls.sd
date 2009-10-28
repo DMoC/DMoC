@@ -1,0 +1,6 @@
+
+# -*- python -*-
+
+Module('common:types_sls',
+	header_files = ['../include/types_sls.h',],
+)

@@ -1,0 +1,14 @@
+
+# -*- python -*-
+
+Module('caba:module_8_sls',
+	classname = 'soclib::caba::Module_8',
+	header_files = ['../source/include/module_8.h',],
+	implementation_files = ['../source/src/module_8.cpp',],
+	instance_parameters  = [
+	parameter.Int('threshold'),
+	],
+	uses = [
+		Uses('caba:globals_sls'),
+	],
+)

@@ -1,0 +1,11 @@
+
+# -*- python -*-
+
+Module('caba:sram_param',
+	classname = 'soclib::caba::SramParam',
+	tmpl_parameters = [
+	parameter.Int('data_byte_width'),
+	parameter.Int('addr_bit_width'),
+	],
+	header_files = ['../include/sram_param.h',],
+)

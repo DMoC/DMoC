@@ -1,0 +1,53 @@
+
+# -*- python -*-
+
+Module('caba:vci_mcc_cache_sls',
+	classname = 'soclib::caba::VciMccCache',
+	   tmpl_parameters = [
+	parameter.Module('vci_param', default = 'caba:vci_param'),
+	   parameter.Module('iss_t'),
+	],
+	header_files = [
+	'../source/include/vci_mcc_cache.h',
+	'../source/include/vci_mcc_cache_stats.h',
+	],
+	implementation_files = [
+	'../source/src/vci_mcc_cache.cpp',
+	'../source/src/vci_mcc_cache_utils.cpp',
+	'../source/src/vci_mcc_cache_transition.cpp',
+	'../source/src/vci_mcc_cache_moore.cpp',
+	'../source/src/vci_mcc_cache_cdb.cpp',
+	],
+	uses = [
+	Uses('caba:base_module'),
+	Uses('common:mapping_table'),
+	Uses('caba:generic_buffer_sls'),
+	Uses('caba:tlb_32_sls'),
+	Uses('common:types_sls'),
+	Uses('caba:mcc_globals_sls'),
+	Uses('common:iss2_sls')
+	],
+	ports = [
+	Port('caba:vci_initiator', 'p_i_vci'),
+	Port('caba:vci_target', 'p_t_vci'),
+	Port('caba:bit_in','p_irq', parameter.Constant('n_irq')),
+	Port('caba:bit_in', 'p_resetn', auto = 'resetn'),
+	Port('caba:clock_in', 'p_clk', auto = 'clock'),
+	],
+	instance_parameters = [
+	parameter.Module('mt', 'common:mapping_table', auto='env:mapping_table'),
+	parameter.Module('mt_inv', 'common:mapping_table', auto='env:mapping_table'),
+	parameter.IntTab('i_index'),
+	parameter.IntTab('t_index'),
+	parameter.Int('icache_lines'),
+	parameter.Int('icache_words'),
+	parameter.Int('dcache_lines'),
+	parameter.Int('dcache_words'),
+	],
+	   extensions = [
+	'dsx:addressable=t_index',
+	'dsx:max_segments=1',
+	'dsx:cpu=wrapper:iss_t',
+	'dsx:get_ident=i_index:p_i_vci,t_index:p_t_vci',
+   ],
+)

@@ -1,0 +1,9 @@
+
+# -*- python -*-
+
+Module('caba:mcc_globals_sls',
+	header_files = ['../source/include/mcc_globals.h',],
+	uses = [
+		Uses('caba:micro_ring_param_sls'),
+	],
+)

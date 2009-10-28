@@ -1,0 +1,24 @@
+
+# -*- python -*-
+
+Signal('caba:micro_ring_sls',
+	   classname = 'soclib::caba::MicroRingSignals',
+	   header_files = ['../source/include/micro_ring_signals.h'],
+	   accepts = {'caba:micro_ring_in':1, 'caba:micro_ring_out':1},
+	   )
+
+PortDecl('caba:micro_ring_in',
+	 classname = 'soclib::caba::MicroRing_In',
+	 signal = 'caba:micro_ring',
+	 header_files = ['../source/include/micro_ring_ports.h'],
+	 )
+
+PortDecl('caba:micro_ring_out',
+	 classname = 'soclib::caba::MicroRing_Out',
+	 signal = 'caba:micro_ring',
+	 header_files = ['../source/include/micro_ring_ports.h'],
+	 )
+
+Module('caba:micro_ring_param_sls',
+	   header_files = ['../source/include/micro_ring_param.h',],
+)

@@ -1,0 +1,11 @@
+
+# -*- python -*-
+
+Module('common:phys_page_table_sls',
+	classname = 'soclib::common::PHYS_PAGE_TABLE',
+	header_files = ['../include/phys_page_table.h',],
+	implementation_files = ['../src/phys_page_table.cpp',],
+	instance_parameters = [
+	parameter.Int('nb_entries','page_size'),
+	],
+)

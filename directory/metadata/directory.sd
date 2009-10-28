@@ -1,0 +1,11 @@
+
+# -*- python -*-
+
+Module('common:directory_sls',
+	classname = 'soclib::common::SOCLIB_DIRECTORY',
+	header_files = ['../include/soclib_directory.h',],
+	implementation_files = ['../src/soclib_directory.cpp',],
+	instance_parameters = [
+	parameter.Int('nb_procs'),
+	],
+)

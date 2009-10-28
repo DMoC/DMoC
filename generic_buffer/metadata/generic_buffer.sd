@@ -1,0 +1,7 @@
+
+# -*- python -*-
+
+Module('caba:generic_buffer_sls',
+	classname = 'soclib::caba::GenericBuffer',
+	header_files = ['../include/caba/generic_buffer.h',],
+)

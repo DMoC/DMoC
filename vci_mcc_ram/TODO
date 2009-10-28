@@ -1,0 +1,17 @@
+Les trucs bizarres : 
+
+micro_ring_param est défini 3 fois : 
+1 - vci_mcc_ram.h
+2 - top.cpp
+3 - platform.desc
+
+Utilisation dans le sc_no_RingSignal de types
+systemC!
+
+
+notes :
+
+vci_mcc_ram -> version "tlb du target fsm".
+version "tlb du target fsm" -> "version mcc du linked access buffer" 
+
+

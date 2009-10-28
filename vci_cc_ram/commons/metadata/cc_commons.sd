@@ -1,0 +1,6 @@
+
+# -*- python -*-
+
+Module('caba:cc_globals_sls',
+	header_files = ['../source/include/cc_globals.h',],
+)
