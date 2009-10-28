@@ -22,7 +22,6 @@ Module('caba:vci_cc_cache_sls',
 	Uses('caba:base_module'),
 	Uses('common:mapping_table'),
 	Uses('caba:generic_buffer_sls'),
-	Uses('common:types_sls'),
 	Uses('caba:cc_globals_sls'),
 	Uses('common:iss2_sls')
 	],

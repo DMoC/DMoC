@@ -82,10 +82,7 @@ tmpl(/**/)::VciCcCache(
 		size_t icache_words,
 		size_t dcache_lines,
 		size_t dcache_words,
-		unsigned int procid,	
-		unsigned int * table_cost,
-		addr_to_homeid_entry_t * home_addr_table,
-		unsigned int nb_memory_nodes
+		unsigned int procid
 		)
 : soclib::caba::BaseModule(insname),
 
@@ -167,9 +164,7 @@ tmpl(/**/)::VciCcCache(
 		r_ICACHE_CPT_INIT("ICACHE_CPT_INIT"),
 	m_id(procid),
 	ncycles(0),
-	m_table_cost(table_cost),
-	m_home_addr_table(home_addr_table),
-	m_nb_memory_nodes(nb_memory_nodes)
+	m_table_cost(table_cost)
 {
 	assert(IS_POW_OF_2(icache_lines));
 	assert(IS_POW_OF_2(dcache_lines));
@@ -207,48 +202,6 @@ tmpl(/**/)::VciCcCache(
 	r_RSP_DCACHE_MISS_BUF = soclib::common::alloc_elems<sc_signal<typename vci_param::data_t> >("RSP_DCACHE_MISS_BUFF", dcache_words);
 	r_RSP_ICACHE_MISS_BUF = soclib::common::alloc_elems<sc_signal<typename vci_param::data_t> >("RSP_DCACHE_MISS_BUFF", icache_words);
 
-#ifdef COHERENT_XCACHE_DEBUG
-	chemin = "./";
-	chemin += (const char*)insname;
-	chemin += ".debug"; 
-	file_chrono.setf(ios_base::hex);
-	file_chrono.open(chemin.c_str(),ios::app);
-	file_chrono << "----| STARTING INFORMATION RECORD" << endl;
-#endif
-#ifdef USE_STATS
-	stats_chemin = "./";
-	stats_chemin += (const char*)insname;
-	stats_chemin += ".stats"; 
-	file_stats.setf(ios_base::hex);
-	file_stats.open(stats_chemin.c_str(),ios::trunc);
-	file_stats << std::dec << m_id << " ----| STARTING INFORMATION RECORD" << endl;
-	stats.ncycles = 0;
-	stats.dcache_hit = 0;
-	stats.dcache_miss = 0;
-	stats.dcache_writes = 0;
-	stats.icache_hit = 0;
-	stats.icache_miss = 0;
-	stats.iread_nack = 0;
-	stats.dread_nack = 0;
-	stats.dwrite_nack = 0;
-	stats.ddelay = 0;
-	stats.nack_ddelay = 0;
-	stats.ddelay_chunck = 0;
-	stats.dnack_chunck = 0;
-	stats.idelay = 0;
-	stats.nack_idelay = 0;
-	stats.inack_chunck = 0;
-	stats.idelay_chunck = 0;
-	stats.dcache_hit = 0;
-	stats.dcache_chunck_miss = 0;
-	stats.icache_hit = 0;
-	stats.icache_chunck_miss = 0;
-	stats.delta_data_latency = 0.0;
-	stats.delta_inst_latency = 0.0;
-	stats.total_reqs = 0;
-	stats.total_dist_reqs = 0;
-#endif
-
 	SC_METHOD (transition);
 	sensitive_pos << p_clk;
 	dont_initialize();
@@ -260,9 +213,6 @@ tmpl(/**/)::VciCcCache(
 
 tmpl(/**/)::~VciCcCache()
 {
-#ifdef USE_STATS
-	gen_output_stats();
-#endif
 	for ( size_t i=0; i<s_dcache_lines; ++i )
 		soclib::common::dealloc_elems(s_DCACHE_DATA[i], s_dcache_words);
 	soclib::common::dealloc_elems(s_DCACHE_TAG, s_dcache_lines);

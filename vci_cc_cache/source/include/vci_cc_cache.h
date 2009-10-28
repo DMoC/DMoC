@@ -29,25 +29,14 @@
 #ifndef SOCLIB_CABA_VCI_CC_CACHE_H
 #define SOCLIB_CABA_VCI_CC_CACHE_H
 
-#ifdef COHERENT_XCACHE_DEBUG
-#include <string>
-#include <fstream>
-#endif
-
 #include <inttypes.h>
 #include <systemc>
 #include <fstream>
 #include "caba_base_module.h"
-#include "types_sls.h" // TODO inclure ceci dans la cc-id-table, réfléchir à une solution propre
 #include "generic_buffer.h"
 #include "vci_initiator.h"
 #include "vci_target.h"
 #include "mapping_table.h"
-
-#define USE_STATS
-#ifdef USE_STATS
-#include "vci_cc_cache_stats.h"
-#endif
 
 namespace soclib {
 using namespace common;
@@ -261,18 +250,6 @@ namespace caba {
 		uint64_t ncycles;
 		unsigned int * m_table_cost;
 		addr_to_homeid_entry_t * m_home_addr_table;
-		unsigned int m_nb_memory_nodes;
-
-		// for debug
-#ifdef USE_STATS
-		cache_info_t stats;
-		std::ofstream file_stats;
-		std::string stats_chemin; 	// set it to : ./insname.stats
-#endif
-#ifdef COHERENT_XCACHE_DEBUG
-		std::ofstream file_chrono;
-		std::string chemin; 	// set it to : ./insname.debug
-#endif
 
 
 
@@ -293,10 +270,7 @@ namespace caba {
 				size_t icache_words,
 				size_t dcache_lines,
 				size_t dcache_words, 
-				unsigned int procid,	
-				unsigned int * table_cost,
-				addr_to_homeid_entry_t * home_addr_table,
-				unsigned int nb_memory_nodes
+				unsigned int procid
 				);
 
 		//struct XCacheInfo getCacheInfo() const; Unimplemented yet
@@ -314,9 +288,6 @@ namespace caba {
 		struct XCacheInfo getCacheInfo() const;
 
 		private:
-#ifdef USE_STATS
-		void gen_output_stats( void );
-#endif
 
 		int address_to_id(typename vci_param::addr_t addr);
 		typename vci_param::data_t be_to_mask(typename iss_t::be_t be);

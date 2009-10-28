@@ -75,22 +75,6 @@ tmpl(void)::transition()
 	bool		write_buffer_get = false;
 
 	ncycles++;
-#ifdef USE_STATS
-	stats.ncycles++;
-#if CONTI_STATS
-	if (stats.ncycles%10000 == 0) // compute and print a chunck stat!
-	{
-		stats.delta_data_latency = (float)(stats.ddelay_chunck)/(float)(stats.dcache_chunck_miss);
-		stats.delta_inst_latency = (float)(stats.idelay_chunck)/(float)(stats.icache_chunck_miss);
-		stats.ddelay_chunck = 0;
-		stats.idelay_chunck = 0;
-		stats.dcache_chunck_miss = 0;
-		stats.icache_chunck_miss = 0;
-		file_stats << std::dec << m_id << " lat_data " << std::dec << stats.delta_data_latency << std::endl; 
-		file_stats << std::dec << m_id << " lat_inst " << std::dec << stats.delta_inst_latency << std::endl; 
-	}
-#endif
-#endif
 
 	//////////////////////////////
 	//        RESET
@@ -140,16 +124,9 @@ tmpl(void)::transition()
 			{
 				icache_rsp_port.valid          = icache_hit;
 				icache_rsp_port.instruction    = s_ICACHE_DATA[icache_y][icache_x].read();
-#ifdef USE_STATS
-				stats.icache_hit++;
-#endif
 			}
 			else // miss, issue a miss request and wait for the response
 			{
-#ifdef USE_STATS
-				stats.icache_miss++;
-				stats.icache_chunck_miss++;
-#endif
 				r_ICACHE_MISS_ADDR_SAVE = icache_address;
 				r_ICACHE_FSM = ICACHE_WAIT;
 				r_ICACHE_MISS_REQ = true;
@@ -157,11 +134,6 @@ tmpl(void)::transition()
 			break;
 
 		case ICACHE_WAIT : // wait until the response arrives
-#ifdef USE_STATS
-			stats.idelay++;
-			stats.inack_chunck++;
-			stats.idelay_chunck++;
-#endif
 			if (r_IRSP_OK)
 			{
 				r_ICACHE_FSM = ICACHE_UPDT;
@@ -169,10 +141,6 @@ tmpl(void)::transition()
 			break;
 
 		case ICACHE_UPDT :
-#ifdef USE_STATS
-			stats.idelay++;
-			stats.idelay_chunck++;
-#endif
 			s_ICACHE_TAG[icache_y] = icache_z;
 			for (size_t i=0 ; i<s_icache_words ; i++) // Fill up the memory line
 			{
@@ -222,9 +190,6 @@ tmpl(void)::transition()
 						r_DCACHE_FLUSH_WB_REQ = true;
 						r_DCACHE_FIRST_CELL = false;
 						write_buffer_put = true;
-#ifdef USE_STATS
-						stats.dcache_writes+=m_WRITE_BUFFER_DATA.filled_status() + 1;
-#endif
 						r_WRITE_BURST_SIZE = m_WRITE_BUFFER_DATA.filled_status() + 1; 
 					}
 #endif
@@ -267,9 +232,6 @@ tmpl(void)::transition()
 						else // flush write-buffer. 
 						{
 							r_DCACHE_FLUSH_WB_REQ = true;
-#ifdef USE_STATS
-							stats.dcache_writes+=m_WRITE_BUFFER_DATA.filled_status() + 1;
-#endif
 							r_WRITE_BURST_SIZE = m_WRITE_BUFFER_DATA.filled_status() + 1; // could be implemented with a little 4bits adder
 							assert(m_WRITE_BUFFER_DATA.wok());
 						}
@@ -302,9 +264,6 @@ tmpl(void)::transition()
 							write_buffer_put = true;
 							r_DCACHE_FIRST_CELL = false;
 							r_DCACHE_FLUSH_WB_REQ = true;
-#ifdef USE_STATS
-							stats.dcache_writes+=m_WRITE_BUFFER_DATA.filled_status() + 1;
-#endif
 							r_WRITE_BURST_SIZE = m_WRITE_BUFFER_DATA.filled_status() + 1; // could be implemented with a
 							// little (4bits? -> 16 words) full adder
 							assert(m_WRITE_BUFFER_DATA.wok());
@@ -325,16 +284,9 @@ tmpl(void)::transition()
 									r_DCACHE_REQ = true;
 									// Set tag in this state and not in miss update to
 									// avoid race conditions with invalidations
-#ifdef USE_STATS
-									stats.dcache_miss++;
-									stats.dcache_chunck_miss++;
-#endif
 								}
 								else   // hit, going to idle, deliver the data to the processor
 								{
-#ifdef USE_STATS
-									stats.dcache_hit++;
-#endif
 									r_DCACHE_FSM = DCACHE_IDLE;
 									dcache_rsp_port.valid = true;
 									dcache_rsp_port.rdata = s_DCACHE_DATA[dcache_y][dcache_x].read();
@@ -426,11 +378,6 @@ tmpl(void)::transition()
 
 
 		case DCACHE_MISSWAIT :
-#ifdef USE_STATS
-			stats.ddelay++;
-			stats.dnack_chunck++;
-			stats.ddelay_chunck++;
-#endif
 			if (r_DRSP_OK) { r_DCACHE_FSM = DCACHE_MISSUPDT; } // cache line received go to update
 			else if (dcache_ram_inval) // else, check for pending invalidation request
 			{
@@ -444,10 +391,6 @@ tmpl(void)::transition()
 			{
 				const unsigned int y = m_d_y[r_DCACHE_ADDR_SAVE.read()];
 				const unsigned int x = m_d_x[r_DCACHE_ADDR_SAVE.read()];
-#ifdef USE_STATS
-				stats.ddelay++;
-				stats.ddelay_chunck++;
-#endif
 				for (size_t i=0 ; i < s_dcache_words ; i++)
 				{
 					s_DCACHE_DATA[y][i] = r_RSP_DCACHE_MISS_BUF[i];
@@ -533,13 +476,6 @@ tmpl(void)::transition()
 				assert(! (r_DCACHE_REQ && r_DCACHE_FLUSH_WB_REQ));	
 				if (r_DCACHE_REQ) // A Data cache request 
 				{
-#ifdef USE_STATS
-					if (address_to_id(r_DCACHE_ADDR_SAVE.read()) != -1)
-					{ // accessing a memory node (tty, fdacces etc returns -1)
-						stats . total_dist_reqs += m_table_cost[address_to_id(r_DCACHE_ADDR_SAVE.read())];
-						stats . total_reqs += 1;
-					}
-#endif
 
 					r_REQ_DCACHE_ADDR_PHYS  = r_DCACHE_ADDR_SAVE.read(); // PHYS addr : the one to send on wires 
 					if (dr_ll) { r_VCI_REQ_FSM = REQ_LL; }
@@ -557,13 +493,6 @@ tmpl(void)::transition()
 					// if we need to "retry" the request, the buffer still contains the data until we call init() when all the requests
 					// have been ackownledged (response received)..
 
-#ifdef USE_STATS
-					if (address_to_id(m_WRITE_BUFFER_ADDR.read()) != -1)
-					{
-						stats . total_dist_reqs += m_table_cost[address_to_id(m_WRITE_BUFFER_ADDR.read())];
-						stats . total_reqs += 1;
-					}
-#endif
 					r_REQ_DCACHE_ADDR_PHYS   = m_WRITE_BUFFER_ADDR.read();
 					r_REQ_DCACHE_DATA        = m_WRITE_BUFFER_DATA.read();
 					assert(m_WRITE_BUFFER_DATA.rok());
@@ -573,13 +502,6 @@ tmpl(void)::transition()
 				}
 				else if (r_ICACHE_MISS_REQ) // Else, process instruction miss
 				{
-#ifdef USE_STATS
-					if (address_to_id(r_ICACHE_MISS_ADDR_SAVE.read()) != -1)
-					{
-						stats . total_dist_reqs += m_table_cost[address_to_id(r_ICACHE_MISS_ADDR_SAVE.read())];
-						stats . total_reqs += 1;
-					}
-#endif
 
 					r_REQ_ICACHE_ADDR_PHYS = r_ICACHE_MISS_ADDR_SAVE.read();
 					r_VCI_REQ_FSM = REQ_IMISS;
@@ -594,10 +516,6 @@ tmpl(void)::transition()
 			if (p_i_vci.cmdack.read())
 			{ 
 				r_VCI_REQ_FSM = REQ_IWAIT;
-#ifdef COHERENT_XCACHE_DEBUG
-				file_chrono << std::dec << ncycles << " " << m_i_ident << " : " << " INST @0x" << std::hex <<  (r_ICACHE_MISS_ADDR_SAVE & m_icache_yzmask)
-					<< " page4k P_" << std::dec << ((r_ICACHE_MISS_ADDR_SAVE & 0x00FFFFFF)>>12) << " pc_0x" << std::hex << icache_address;
-#endif
 			}
 			break;
 
@@ -608,10 +526,6 @@ tmpl(void)::transition()
 			// Commands wich requires a  1 cell packet
 			if (p_i_vci.cmdack.read())
 			{ 
-#ifdef COHERENT_XCACHE_DEBUG
-				file_chrono << std::dec << ncycles << " " << m_i_ident << " : " << " DATA-R @0x" << std::hex <<  (r_REQ_DCACHE_ADDR_PHYS & m_dcache_yzmask )
-					<< " page4k P_" << std::dec << ((r_REQ_DCACHE_ADDR_PHYS & 0x00FFFFFF )>>12) << " pc_0x" << std::hex << icache_address;
-#endif
 				r_VCI_REQ_FSM = REQ_DWAIT;
 			}
 			break;
@@ -623,9 +537,6 @@ tmpl(void)::transition()
 				r_VCI_REQ_FSM = REQ_IDLE;
 				r_ICACHE_MISS_REQ = false;
 				r_IRSP_OK = false;
-#ifdef COHERENT_XCACHE_DEBUG
-				file_chrono << std::dec << " lat : " << std::dec << delay << std::endl; 
-#endif
 			}
 			else if (r_IRETRY_REQ)
 			{
@@ -645,9 +556,6 @@ tmpl(void)::transition()
 				// ATTENTION! l'information que l'on a un SC doit survivre jusqu'à la fin 
 				// de la réception des réponses, ceci permet de renvoyer au processeur la
 				// donnée lue!
-#ifdef COHERENT_XCACHE_DEBUG
-				file_chrono << std::dec << " lat : " << std::dec << delay << std::endl; 
-#endif
 			}
 			else if (r_DRETRY_REQ)
 			{
@@ -665,11 +573,6 @@ tmpl(void)::transition()
 					{
 						r_VCI_REQ_FSM = REQ_DWAIT;
 						assert(!m_WRITE_BUFFER_DATA.rok());
-#ifdef COHERENT_XCACHE_DEBUG
-						file_chrono << std::dec << ncycles << " " << m_i_ident << " : " << " DATA-W BURST SIZE " << std::dec  << r_WRITE_BURST_SIZE.read()
-							<< std::hex <<  " @0x" << std::hex <<  (r_REQ_DCACHE_ADDR_PHYS & m_dcache_yzmask )
-							<< " page4k P_" << std::dec << ((r_REQ_DCACHE_ADDR_PHYS & 0x00FFFFFF )>>12) << " pc_0x" << std::hex << icache_address;
-#endif
 					}
 					else
 					{
@@ -753,19 +656,11 @@ tmpl(void)::transition()
 				{ 
 					r_VCI_RSP_FSM = RSP_IDLE; 
 					r_IRSP_OK = true;
-#ifdef USE_STATS
-					stats.inack_chunck = 0;
-#endif
 				}
 				else if ((r_RSP_CPT == s_icache_words -1) && ((p_i_vci.rerror.read() != vci_param::ERR_NORMAL) || r_IRETRY_REQ.read()))
 				// All responses received but an error was saw, so "retry" the request (DCACHE_FSM still blocked).
 				{  
 					r_VCI_RSP_FSM = RSP_IDLE; 
-#ifdef USE_STATS
-					stats.iread_nack += 1;
-					stats.nack_idelay += (stats.inack_chunck + 1);
-					stats.inack_chunck = 0;
-#endif
 				}
 				// When there is at leas one cell that was NACK'd (error set to 1), we must re-send the request
 				if (p_i_vci.rerror.read() != vci_param::ERR_NORMAL) r_IRETRY_REQ = true; 
@@ -784,18 +679,10 @@ tmpl(void)::transition()
 				{ 
 					r_VCI_RSP_FSM = RSP_IDLE; 
 					r_DRSP_OK = true;
-#ifdef USE_STATS
-					stats.dnack_chunck = 0;
-#endif
 				}
 				else if ((r_RSP_CPT == s_dcache_words -1) && ((p_i_vci.rerror.read() != vci_param::ERR_NORMAL) || r_DRETRY_REQ.read()))
 				{ 
 					r_VCI_RSP_FSM = RSP_IDLE; 
-#ifdef USE_STATS
-					stats.dread_nack += 1;
-					stats.nack_ddelay += (stats.dnack_chunck + 1);
-					stats.dnack_chunck = 0;
-#endif
 				}  
 				if (p_i_vci.rerror.read() != vci_param::ERR_NORMAL) r_DRETRY_REQ = true;
 			}
@@ -817,9 +704,6 @@ tmpl(void)::transition()
 					// reset the internal pointer of the buffer but do not erase the content
 					m_WRITE_BUFFER_ADDR.init_read(); 
 					m_WRITE_BUFFER_DATA.init_read();
-#ifdef USE_STATS
-					stats.dwrite_nack += 1;
-#endif
 				}
 				r_VCI_RSP_FSM = RSP_IDLE;
 			} 
