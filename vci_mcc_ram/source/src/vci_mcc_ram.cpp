@@ -85,7 +85,7 @@ if (&mt_inv == NULL) // Only one NoC for requests and invalidation, pass &mt ins
 }
 else
 {
-		c_core = new soclib::caba::MccRamCore<vci_param,sram_param>("c_core",node_zero,i_ident,t_ident,mt,mt,cct,nb_p,line_size,table_cost,home_addr_table,nb_m);
+		c_core = new soclib::caba::MccRamCore<vci_param,sram_param>("c_core",node_zero,i_ident,t_ident,mt,mt_inv,cct,nb_p,line_size,table_cost,home_addr_table,nb_m);
 }
 		c_sram_32 = new soclib::caba::SRam<sram_param>("c_sram",(unsigned int)m_segment -> size());
 #endif
