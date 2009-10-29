@@ -56,10 +56,10 @@ namespace caba {
 	/***********************************************************************************************/
 	tmpl(bool)::on_write(size_t seg, typename vci_param::addr_t addr, typename vci_param::data_t data, int be, bool eop)
 	{
-		// node_id : in [0 - nb_initiators_on_the_platform[, if node_id < m_NB_PROC the
-		//           initiator was a processor (cache). 
+		// node_id : in [0 - nb_coherent_initiators_on_the_platform[, if node_id > 0 the
+		//           initiator was a processor (cache), or a coherent initiator (??) 
 		// source_id : srcid field of the request, with a N-level NoC it could be anything
-		unsigned int node_id = m_cct->translate_to_id(m_vci_fsm.currentSourceId());
+		int node_id = m_cct->translate_to_id(m_vci_fsm.currentSourceId());
 		unsigned int source_id = m_vci_fsm.currentSourceId();
 		int blocknum = (addr  >> m_ADDR_BLOCK_SHIFT);
 
@@ -80,6 +80,17 @@ namespace caba {
 		m_should_get = rw_seg(s_RAM, (unsigned int)(addr/vci_param::B), data, be, vci_param::CMD_WRITE); // write data in S-RAM
 #endif
 
+		// Save request in all cases, and set correct values for
+		// the S-Ram access (ce, be, we, oe, etc...)
+
+		m_sram_addr = (addr/vci_param::B);
+		m_sram_wdata = data;
+		m_sram_be = be;
+		m_sram_oe = false;
+		m_sram_we = true;
+		m_sram_ce = true;
+
+		if (node_id == -1) return true; // the initiator does not support coherence (ex. fd_access).
 		if (s_DIRECTORY[blocknum].Is_Other(node_id) && eop )
 			// Send invalidation only if it is the last cell of the paquet
 			// in order to avoid deadlocks, report to TODO point for an explanation 
@@ -90,15 +101,6 @@ namespace caba {
 			r_SAV_BLOCKNUM = blocknum;
 			r_SAV_SCRID = source_id;
 		}
-		// Save request in all cases, and set correct values for
-		// the S-Ram access (ce, be, we, oe, etc...)
-
-		m_sram_addr = (addr/vci_param::B);
-		m_sram_wdata = data;
-		m_sram_be = be;
-		m_sram_oe = false;
-		m_sram_we = true;
-		m_sram_ce = true;
 		return true;
 	}
 
@@ -108,10 +110,10 @@ namespace caba {
 	/***********************************************************************************************/
 	tmpl(bool)::on_read(size_t seg, typename vci_param::addr_t addr, typename vci_param::data_t &data, bool eop)
 	{
-		// node_id : in [0 - nb_initiators_on_the_platform[, if node_id < m_NB_PROC the
-		//           initiator was a processor (cache). 
+		// node_id : in [0 - nb_coherent_initiators_on_the_platform[, if node_id == -1 the
+		//           initiator was a processor (cache), or a coherent initiator (??) 
 		// source_id : srcid field of the request, with a N-level NoC it could be anything
-		unsigned int node_id = m_cct->translate_to_id(m_vci_fsm.currentSourceId());
+		int node_id = m_cct->translate_to_id(m_vci_fsm.currentSourceId());
 		unsigned int source_id = m_vci_fsm.currentSourceId();
 		int blocknum = (addr  >> m_ADDR_BLOCK_SHIFT);
 
@@ -126,15 +128,6 @@ namespace caba {
 		}
 #endif
 
-		if ((s_DIRECTORY[blocknum].Is_p(node_id)==false)
-				&& (node_id < m_NB_PROCS) && eop) // Update the directory
-		{
-			r_RAM_FSM = RAM_DIRUPD;
-			r_SAV_ADDRESS = m_vci_fsm.getBase(seg)+addr;
-			r_SAV_SEGNUM = seg;
-			r_SAV_BLOCKNUM = blocknum;
-			r_SAV_SCRID = source_id;
-		}
 #ifdef DEBUG_SRAM
 		m_should_get  = s_RAM[addr/vci_param::B];
 		data = m_should_get;
@@ -150,7 +143,17 @@ namespace caba {
 
 		m_fsm_data = &data; // save the data location pointer, will be set in genMealy function.
 
-
+		if (node_id == -1) return true; // the initiator does not support coherence (ex. fd_access).
+		assert(node_id < m_NB_PROCS); // if not, an initiator which is not a processor but support coherence has sent
+																	// this request.
+		if ((s_DIRECTORY[blocknum].Is_p(node_id)==false) &&  eop) // Update the directory
+		{
+			r_RAM_FSM = RAM_DIRUPD;
+			r_SAV_ADDRESS = m_vci_fsm.getBase(seg)+addr;
+			r_SAV_SEGNUM = seg;
+			r_SAV_BLOCKNUM = blocknum;
+			r_SAV_SCRID = source_id;
+		}
 		return true;
 	}
 }}

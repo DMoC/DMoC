@@ -34,12 +34,15 @@ namespace soclib {
 namespace common {
     // Initialisation des membres statiques
     CcIdTable * CcIdTable::unique_ref(NULL);
-    std::map<unsigned int ,  soclib::common::IntTab >  * CcIdTable::relation_id_target_map(NULL);
+    std::map<unsigned int ,  soclib::common::IntTab >  * CcIdTable::relation_cc_id_target_map(NULL);
     std::map<unsigned int , unsigned int >  * CcIdTable::relation_srcid_id_map(NULL);
     
+		int CcIdTable::coherent_id(-1);
+		unsigned int CcIdTable::max_coherent_id(0);
+
     CcIdTable::CcIdTable(void)
     {
-        relation_id_target_map = new std::map<unsigned int ,  soclib::common::IntTab >;
+        relation_cc_id_target_map = new std::map<unsigned int ,  soclib::common::IntTab >;
         relation_srcid_id_map  = new std::map<unsigned int , unsigned int >;
     }
 
@@ -47,23 +50,38 @@ namespace common {
     {
     }
 
-    void CcIdTable::register_me(unsigned int id, unsigned int i_index, soclib::common::IntTab t_index)
+    void CcIdTable::register_coherent_initiator(unsigned int i_index, soclib::common::IntTab t_index)
     {
-        assert((*relation_id_target_map).find(id) == relation_id_target_map->end());
+				coherent_id++;
+				max_coherent_id++;
+        assert((*relation_cc_id_target_map).find(coherent_id) == relation_cc_id_target_map->end());
         assert((*relation_srcid_id_map).find(i_index) == relation_srcid_id_map->end());
-        (*relation_id_target_map)[id] = t_index;
-        (*relation_srcid_id_map)[i_index] = id;
+				// Create  the relation < coherent_id -> t_index >
+        (*relation_cc_id_target_map)[coherent_id] = t_index;
+				// Create  the relation < i_index -> coherent_id >
+        (*relation_srcid_id_map)[i_index] = coherent_id;
 
     }
-    unsigned int CcIdTable::translate_to_id(unsigned int i_index)
+
+    void CcIdTable::register_non_coherent_initiator(unsigned int i_index)
+    {
+				// Create  the relation < i_index -> -1 >
+        assert((*relation_srcid_id_map).find(i_index) == relation_srcid_id_map->end());
+        (*relation_srcid_id_map)[i_index] = -1;
+
+    }
+
+    int CcIdTable::translate_to_id(unsigned int i_index)
     {
         assert((*relation_srcid_id_map).find(i_index) != relation_srcid_id_map->end());
         return (*relation_srcid_id_map)[i_index];
     }
+
     soclib::common::IntTab CcIdTable::translate_to_target(unsigned int id)
     {
-        assert((*relation_id_target_map).find(id) != relation_id_target_map->end());
-        return (*relation_id_target_map)[id];
+				assert(id < max_coherent_id);
+        assert((*relation_cc_id_target_map).find(id) != relation_cc_id_target_map->end());
+        return (*relation_cc_id_target_map)[id];
     }
 
     CcIdTable * CcIdTable::CreateCcIdTable(void)
