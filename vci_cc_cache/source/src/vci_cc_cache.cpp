@@ -1,4 +1,4 @@
-/* -*- c++ -*-
+				/* -*- c++ -*-
  *
  * SOCLIB_LGPL_HEADER_BEGIN
  * 
@@ -74,18 +74,18 @@ tmpl(const char *)::m_model = "Special invention cache";
 
 tmpl(/**/)::VciCcCache(
 		sc_module_name insname,
-		const soclib::common::MappingTable &mt,
-		const soclib::common::MappingTable &mt_inv,
 		const soclib::common::IntTab &i_index,
 		const soclib::common::IntTab &t_index,
 		size_t icache_lines,
 		size_t icache_words,
 		size_t dcache_lines,
 		size_t dcache_words,
-		unsigned int procid,	
+		unsigned int procid,
 		unsigned int * table_cost,
 		addr_to_homeid_entry_t * home_addr_table,
-		unsigned int nb_memory_nodes
+		unsigned int nb_memory_nodes,
+		const soclib::common::MappingTable &mt,
+		const soclib::common::MappingTable &mt_inv
 		)
 : soclib::caba::BaseModule(insname),
 
@@ -96,9 +96,6 @@ tmpl(/**/)::VciCcCache(
 
 	m_cacheability_table(mt.getCacheabilityTable()),
 	m_iss(this->name(), procid),
-	m_segment(mt_inv.getSegment(t_index)),
-	m_i_ident(mt.indexForId(i_index)),   
-	m_t_ident(mt_inv.indexForId(t_index)),   
 
 	s_dcache_lines(dcache_lines),
 	s_dcache_words(dcache_words),
@@ -183,6 +180,19 @@ tmpl(/**/)::VciCcCache(
 	assert(dcache_words <= 16);
 	assert(icache_lines <= 1024);
 	assert(dcache_lines <= 1024);
+
+	// Some initialisations :
+	if (&mt_inv == NULL) // Only one NoC is used to transport requests AND invalidations,
+											//it MUST not have "hierarchy" in order to avoid deadlocks
+	{
+		m_segment = new soclib::common::Segment(mt.getSegment(t_index));
+	}
+	else
+	{
+		m_segment = new soclib::common::Segment(mt_inv.getSegment(t_index));
+	}
+	m_i_ident = mt.indexForId(i_index) ;  
+	m_t_ident = mt_inv.indexForId(t_index) ;  
 	// Allocation arrays and buffers, use alloc_elems to allocate contiguously the data and enhance performances
 	// as an array, but calling a specific constructor for each object
 	s_DCACHE_DATA = new sc_signal<typename vci_param::data_t>*[dcache_lines];

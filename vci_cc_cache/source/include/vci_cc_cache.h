@@ -126,7 +126,7 @@ namespace caba {
 		// STRUCTURAL PARAMETERS
 		soclib::common::AddressDecodingTable<uint32_t, bool> m_cacheability_table; // each memory segment is taged as cacheable/uncacheable
 		iss_t m_iss;	// processor instruction set simulator
-		soclib::common::Segment m_segment;	// memory segment allocated for the vci target interface
+		soclib::common::Segment * m_segment;	// memory segment allocated for the vci target interface
 		unsigned int m_i_ident; // initiator id
 		unsigned int m_t_ident; // target id 
 		static const char * m_model;  
@@ -169,7 +169,7 @@ namespace caba {
 		const typename vci_param::be_t m_full_be;
 
 
-		// Structures : data/inst. cache, data/inst. tag, TLB.
+		// Structures : data/inst. cache, data/inst. tag,
 		sc_signal<typename vci_param::data_t>	**s_DCACHE_DATA;
 		sc_signal<typename vci_param::addr_t>	*s_DCACHE_TAG;
 		sc_signal<typename vci_param::data_t>	**s_ICACHE_DATA;
@@ -202,7 +202,7 @@ namespace caba {
 		sc_signal<typename vci_param::be_t>		r_DCACHE_WL_BE_SAVE; // BE of last (currently processed) cell of a write burst packet.
 
 		// control signals for DCACHE_FSM
-		sc_signal<bool>		r_DCACHE_PENDING_WRITE; // There is a waiting  write request in the _SAVE register
+		sc_signal<bool>		r_DCACHE_PENDING_WRITE; // There is a waiting  write request in the *_SAVE register
 		sc_signal<bool>		r_DCACHE_FIRST_CELL;		// Control signal to tag a "first entry in write-buffer"
 
 		// control signals from DCACHE_FSM to REQ_FSM
@@ -285,18 +285,18 @@ namespace caba {
 
 		VciCcCache(
 				sc_module_name insname,
-				const soclib::common::MappingTable &mt,
-				const soclib::common::MappingTable &mt_inv,
 				const soclib::common::IntTab &i_index,
 				const soclib::common::IntTab &t_index,
 				size_t icache_lines,
 				size_t icache_words,
 				size_t dcache_lines,
 				size_t dcache_words, 
-				unsigned int procid,	
+				unsigned int procid,
 				unsigned int * table_cost,
 				addr_to_homeid_entry_t * home_addr_table,
-				unsigned int nb_memory_nodes
+				unsigned int nb_memory_nodes,
+				const soclib::common::MappingTable &mt,
+				const soclib::common::MappingTable &mt_inv = NULL
 				);
 
 		//struct XCacheInfo getCacheInfo() const; Unimplemented yet
