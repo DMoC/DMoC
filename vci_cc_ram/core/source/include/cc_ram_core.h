@@ -38,7 +38,6 @@
 #include "caba_base_module.h"
 #include "vci_target_fsm_nlock_tlb.h" // Special target_fsm that supports extended requests (TLB MISS's)
 #include "vci_initiator.h"
-#include "types_sls.h"
 
 #include "generic_fifo.h" 
 #include "mapping_table.h"
@@ -183,8 +182,7 @@ namespace caba{
 #ifdef DEBUG_SRAM
 						const soclib::common::Loader &loader,				// Code loader
 #endif
-						const unsigned int line_size,								// Configured line size. TODO : should/can be changed by vci_param::B ?
-						addr_to_homeid_entry_t * home_addr_table);	// Used to convert node_id <-> memory_segment_base_address
+						const unsigned int line_size);								// Configured line size. TODO : should/can be changed by vci_param::B ?
 
 				~CcRamCore();  
 

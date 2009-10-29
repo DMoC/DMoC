@@ -56,8 +56,7 @@ namespace caba {
 #ifdef DEBUG_SRAM
 			const soclib::common::Loader &loader,				// Code loader
 #endif
-			const unsigned int line_size,
-			addr_to_homeid_entry_t * home_addr_table) :
+			const unsigned int line_size) :
 		caba::BaseModule(insname),
 		r_RAM_FSM("RAM_FSM"),
 		r_INV_FSM("INV_FSM"),

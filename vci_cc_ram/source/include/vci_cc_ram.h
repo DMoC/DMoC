@@ -36,7 +36,6 @@
 #include <fstream>
 
 #include "caba_base_module.h"
-#include "types_sls.h"
 
 #include "cc_ram_core.h"
 #include "sram.h"
@@ -103,8 +102,7 @@ namespace caba{
 						soclib::common::CcIdTable  * cct,						// CacheCoherence Id Table to convert Source_id <-> Invalidation Target_address
 						const unsigned int nb_p,										// Number of processors in the system -> size of directory entry
 						const soclib::common::Loader &loader,				// Code loader
-						const unsigned int line_size,								// Configured line size. TODO : should/can be changed by vci_param::B ?
-						addr_to_homeid_entry_t * home_addr_table		// Used to convert node_id <-> memory_segment_base_address
+						const unsigned int line_size								// Configured line size. TODO : should/can be changed by vci_param::B ?
 						);
 
 				~VciCcRam();  
