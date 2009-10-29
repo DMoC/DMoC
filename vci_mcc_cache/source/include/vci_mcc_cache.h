@@ -41,7 +41,6 @@
 #include "vci_target.h"
 #include "mapping_table.h"
 
-
 namespace soclib {
 using namespace common;
 using namespace std;
@@ -127,7 +126,7 @@ namespace caba {
 		// STRUCTURAL PARAMETERS
 		soclib::common::AddressDecodingTable<uint32_t, bool> m_cacheability_table; // each memory segment is taged as cacheable/uncacheable
 		iss_t m_iss;	// processor instruction set simulator
-		soclib::common::Segment m_segment;	// memory segment allocated for the vci target interface
+		soclib::common::Segment * m_segment;	// memory segment allocated for the vci target interface
 		unsigned int m_i_ident; // initiator id
 		unsigned int m_t_ident; // target id 
 		static const char * m_model;  
@@ -282,16 +281,16 @@ namespace caba {
 
 		VciMccCache(
 				sc_module_name insname,
-				const soclib::common::MappingTable &mt,
-				const soclib::common::MappingTable &mt_inv,
 				const soclib::common::IntTab &i_index,
 				const soclib::common::IntTab &t_index,
 				size_t icache_lines,
 				size_t icache_words,
 				size_t dcache_lines,
 				size_t dcache_words, 
-				unsigned int procid,	
-				uint32_t migrability_mask
+				unsigned int procid,
+				uint32_t migrability_mask,
+				const soclib::common::MappingTable &mt,
+				const soclib::common::MappingTable &mt_inv = NULL
 				);
 
 		//struct XCacheInfo getCacheInfo() const; Unimplemented yet
