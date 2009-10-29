@@ -71,7 +71,7 @@ namespace caba{
 
 				soclib::common::Loader					m_loader;
 				soclib::common::MappingTable		m_MapTab;			
-				soclib::common::Segment					m_segment;    // Only 1 segment on this version (page migration allowed).
+				soclib::common::Segment					* m_segment;    // Only 1 segment on this version (page migration allowed).
 
 				// Interconnection signals : c_core -> c_sram 
 				sc_signal<bool>   s_ce_core2sram;
@@ -97,12 +97,12 @@ namespace caba{
 						sc_module_name insname,
 						const soclib::common::IntTab &i_ident,			// Source_id
 						const soclib::common::IntTab &t_ident,			// Target_id
-						const soclib::common::MappingTable &mt,			// Mapping Table for read/write requets
-						const soclib::common::MappingTable &mt_inv, // Mapping Table for invalidation requests (alternative NoC). 
 						soclib::common::CcIdTable  * cct,						// CacheCoherence Id Table to convert Source_id <-> Invalidation Target_address
 						const unsigned int nb_p,										// Number of processors in the system -> size of directory entry
 						const soclib::common::Loader &loader,				// Code loader
-						const unsigned int line_size								// Configured line size. TODO : should/can be changed by vci_param::B ?
+						const unsigned int line_size,								// Configured line size. TODO : should/can be changed by vci_param::B ?
+						const soclib::common::MappingTable &mt,			// Mapping Table for read/write requets
+						const soclib::common::MappingTable &mt_inv = NULL // Mapping Table for invalidation requests (alternative NoC). 
 						);
 
 				~VciCcRam();  
