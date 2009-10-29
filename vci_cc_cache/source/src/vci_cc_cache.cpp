@@ -234,6 +234,7 @@ tmpl(/**/)::~VciCcCache()
 
 	delete [] s_DCACHE_DATA;
 	delete [] s_ICACHE_DATA;
+	delete m_segment;
 };
 
 }} // name spaces caba soclib
