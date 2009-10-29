@@ -191,7 +191,7 @@ namespace caba {
 		m_fsm_data = &data; // save the data location pointer, will be set in genMealy function.
 
 		if (node_id == -1) return true; // the initiator does not support coherence (ex. fd_access).
-		assert(node_id < m_NB_PROCS); // if not, an initiator which is not a processor but support coherence has sent
+		assert((unsigned int)node_id < m_NB_PROCS); // if not, an initiator which is not a processor but support coherence has sent
 																	// this request.
 		if ((s_DIRECTORY[blocknum].Is_p(node_id)==false) &&  eop) // Update the directory
 		{
