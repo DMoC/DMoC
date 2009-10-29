@@ -170,13 +170,6 @@ namespace caba{
 
 
 				uint64_t				m_nbcycles;
-#define USE_STATS
-#ifdef USE_STATS
-				// Used to retrieve statistic
-				unsigned long long * m_nb_success;
-				std::ofstream file_stats;
-				std::string stats_chemin; 	// set it to : ./insname.stats
-#endif
 
 			public :
 				CcRamCore (

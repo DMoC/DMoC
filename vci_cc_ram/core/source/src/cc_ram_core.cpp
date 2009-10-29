@@ -119,30 +119,11 @@ namespace caba {
 		{
 			s_DIRECTORY[i].init(m_NB_PROCS);
 		}
-#ifdef USE_STATS
-		stats_chemin = "./";
-		stats_chemin += name().c_str();
-		stats_chemin += ".stats"; 
-		file_stats.setf(ios_base::hex);
-		cout << "chemin : " << stats_chemin.c_str() << endl;
-		file_stats.open(stats_chemin.c_str(),ios::trunc);
-
-		m_nb_success = new unsigned long long [m_NB_PROCS];
-#endif
 	}; // end constructor
 
 	tmpl(/**/)::~CcRamCore()
 	{
 		DTOR_OUT
-#ifdef USE_STATS
-		file_stats << dec <<  " Poisonned/busy/access NACKS : ";
-		for (unsigned int i = 0; i < m_NB_PROCS ; i ++)
-		{
-			file_stats <<" "<< "/" << m_nb_success[i]; 
-		}
-		file_stats << endl;
-		file_stats.close();
-#endif
 #ifdef DEBUG_SRAM
 		delete [] s_RAM;
 #endif

@@ -29,10 +29,6 @@
 #ifndef SOCLIB_CABA_VCI_MCC_CACHE_H
 #define SOCLIB_CABA_VCI_MCC_CACHE_H
 
-#ifdef COHERENT_XCACHE_DEBUG
-#include <string>
-#include <fstream>
-#endif
 
 #include <inttypes.h>
 #include <systemc>
@@ -45,10 +41,6 @@
 #include "vci_target.h"
 #include "mapping_table.h"
 
-#define USE_STATS
-#ifdef USE_STATS
-#include "vci_mcc_cache_stats.h"
-#endif
 
 namespace soclib {
 using namespace common;
@@ -281,16 +273,6 @@ namespace caba {
 		addr_to_homeid_entry_t * m_home_addr_table;
 		unsigned int m_nb_memory_nodes;
 
-		// for debug
-#ifdef USE_STATS
-		cache_info_t stats;
-		std::ofstream file_stats;
-		std::string stats_chemin; 	// set it to : ./insname.stats
-#endif
-#ifdef COHERENT_XCACHE_DEBUG
-		std::ofstream file_chrono;
-		std::string chemin; 	// set it to : ./insname.debug
-#endif
 
 
 
@@ -333,9 +315,6 @@ namespace caba {
 		struct XCacheInfo getCacheInfo() const;
 
 		private:
-#ifdef USE_STATS
-		void gen_output_stats( void );
-#endif
 
 		int address_to_id(typename vci_param::addr_t addr);
 		typename vci_param::data_t be_to_mask(typename iss_t::be_t be);

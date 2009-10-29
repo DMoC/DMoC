@@ -44,9 +44,6 @@ namespace caba {
 	tmpl(bool)::is_busy(void)
 	{
 #ifdef DEADLOCK_NACK_POLICY
-#ifdef USE_STATS
-		// TODO compute NACKeds requests
-#endif
 		return (r_RAM_FSM != RAM_IDLE);
 #else
 		return false;
@@ -124,9 +121,6 @@ namespace caba {
 #ifdef DEADLOCK_NACK_POLICY
 		if (s_POISONNED[page_index])
 		{ 
-#ifdef USE_STATS
-		// TODO compute NACKeds requests
-#endif
 			m_last_write_nack = !eop;
 			return false;
 		}
@@ -157,10 +151,6 @@ namespace caba {
 		m_fsm_data = &data; // save the data location pointer, will be set in genMealy function.
 
 
-#ifdef USE_STATS
-		if (node_id < m_NB_PROCS)
-			m_nb_success[node_id] = m_nb_success[node_id] + 1;
-#endif
 		return true;
 	}
 }}

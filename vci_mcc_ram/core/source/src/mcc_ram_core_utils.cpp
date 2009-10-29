@@ -168,10 +168,6 @@ namespace caba {
 		r_IN_TRANSACTION = !eop;
 		if (s_POISONNED[page_index])
 		{ 
-#ifdef USE_STATS
-			if (node_id < m_NB_PROCS)
-				m_nb_poisonned_nack[node_id] = m_nb_poisonned_nack[node_id] + 1;
-#endif
 			m_last_write_nack = !eop;
 			return false;
 		}
@@ -202,10 +198,6 @@ namespace caba {
 		m_fsm_data = &data; // save the data location pointer, will be set in genMealy function.
 
 
-#ifdef USE_STATS
-		if (node_id < m_NB_PROCS)
-			m_nb_success[node_id] = m_nb_success[node_id] + 1;
-#endif
 		return true;
 	}
 

@@ -212,15 +212,6 @@ namespace caba{
 				uint64_t				m_nbcycles;
 				bool						m_last_write_nack;  // used to detect on read/write modification of a page
 																						// status (poison/unpoison) meanwhile processing a packet. Only used for checking, can be removed
-#define USE_STATS
-#ifdef USE_STATS
-				// Used to retrieve statistic
-				unsigned long long * m_nb_poisonned_nack;
-				unsigned long long * m_nb_busy_nack;
-				unsigned long long * m_nb_success;
-				std::ofstream file_stats;
-				std::string stats_chemin; 	// set it to : ./insname.stats
-#endif
 
 			public :
 				MccRamCore (
