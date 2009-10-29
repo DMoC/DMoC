@@ -48,14 +48,4 @@ tmpl(typename vci_param::data_t)::be_to_mask(typename iss_t::be_t be)
     return ret;
 }
 
-tmpl(int)::address_to_id(typename vci_param::addr_t addr)
-{
-	for(unsigned int i = 0; i < m_nb_memory_nodes; i++)
-	{
-		if (addr  >= (m_home_addr_table[i].base_addr ) && (addr < (m_home_addr_table[i].base_addr + m_home_addr_table[i].size)))
-			return m_home_addr_table[i].node_id;
-	}
-	return -1;
-}
-
 }}

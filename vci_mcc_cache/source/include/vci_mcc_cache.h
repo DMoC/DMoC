@@ -269,9 +269,6 @@ namespace caba {
 		// structural parameters
 		unsigned int m_id;
 		uint64_t ncycles;
-		unsigned int * m_table_cost;
-		addr_to_homeid_entry_t * m_home_addr_table;
-		unsigned int m_nb_memory_nodes;
 
 
 
@@ -294,10 +291,7 @@ namespace caba {
 				size_t dcache_lines,
 				size_t dcache_words, 
 				unsigned int procid,	
-				uint32_t migrability_mask,
-				unsigned int * table_cost,
-				addr_to_homeid_entry_t * home_addr_table,
-				unsigned int nb_memory_nodes
+				uint32_t migrability_mask
 				);
 
 		//struct XCacheInfo getCacheInfo() const; Unimplemented yet
@@ -316,7 +310,6 @@ namespace caba {
 
 		private:
 
-		int address_to_id(typename vci_param::addr_t addr);
 		typename vci_param::data_t be_to_mask(typename iss_t::be_t be);
 		void transition();
 		void genMoore();

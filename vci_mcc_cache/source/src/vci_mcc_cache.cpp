@@ -83,10 +83,7 @@ tmpl(/**/)::VciMccCache(
 		size_t dcache_lines,
 		size_t dcache_words,
 		unsigned int procid,	
-		uint32_t migrability_mask,
-		unsigned int * table_cost,
-		addr_to_homeid_entry_t * home_addr_table,
-		unsigned int nb_memory_nodes
+		uint32_t migrability_mask
 		)
 : soclib::caba::BaseModule(insname),
 
@@ -177,10 +174,7 @@ tmpl(/**/)::VciMccCache(
 		r_DCACHE_CPT_INIT("DCACHE_CPT_INIT"),
 		r_ICACHE_CPT_INIT("ICACHE_CPT_INIT"),
 	m_id(procid),
-	ncycles(0),
-	m_table_cost(table_cost),
-	m_home_addr_table(home_addr_table),
-	m_nb_memory_nodes(nb_memory_nodes)
+	ncycles(0)
 {
 	assert(IS_POW_OF_2(icache_lines));
 	assert(IS_POW_OF_2(dcache_lines));
