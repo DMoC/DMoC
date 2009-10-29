@@ -55,9 +55,7 @@ namespace caba {
 			const unsigned int nb_p,
 			const soclib::common::Loader &loader,
 			const unsigned int line_size,
-			unsigned int * table_cost,
-			addr_to_homeid_entry_t * home_addr_table,
-			unsigned int nb_m) :
+			addr_to_homeid_entry_t * home_addr_table) :
 		caba::BaseModule(insname),
 		m_loader(loader),
 		m_MapTab(mt),
@@ -65,9 +63,9 @@ namespace caba {
 	{
 		// Instanciate sub_modules
 #ifdef DEBUG_SRAM
-		c_core = new soclib::caba::CcRamCore<vci_param,sram_param>("c_core",i_ident,t_ident,mt,mt_inv,cct,nb_p,loader,line_size,table_cost,home_addr_table,nb_m);
+		c_core = new soclib::caba::CcRamCore<vci_param,sram_param>("c_core",i_ident,t_ident,mt,mt_inv,cct,nb_p,loader,line_size,home_addr_table);
 #else
-		c_core = new soclib::caba::CcRamCore<vci_param,sram_param>("c_core",i_ident,t_ident,mt,mt_inv,cct,nb_p,line_size,table_cost,home_addr_table,nb_m);
+		c_core = new soclib::caba::CcRamCore<vci_param,sram_param>("c_core",i_ident,t_ident,mt,mt_inv,cct,nb_p,line_size,home_addr_table);
 		c_sram_32 = new soclib::caba::SRam<sram_param>("c_sram",(unsigned int)m_segment.size());
 #endif
 

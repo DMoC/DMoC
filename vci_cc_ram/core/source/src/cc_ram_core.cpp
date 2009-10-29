@@ -57,9 +57,7 @@ namespace caba {
 			const soclib::common::Loader &loader,				// Code loader
 #endif
 			const unsigned int line_size,
-			unsigned int * table_cost,
-			addr_to_homeid_entry_t * home_addr_table,
-			unsigned int nb_m) :
+			addr_to_homeid_entry_t * home_addr_table) :
 		caba::BaseModule(insname),
 		r_RAM_FSM("RAM_FSM"),
 		r_INV_FSM("INV_FSM"),
