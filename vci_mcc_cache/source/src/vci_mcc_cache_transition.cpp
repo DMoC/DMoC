@@ -96,7 +96,7 @@ tmpl(void)::transition()
 	//        RESET
 	//////////////////////////////
 	if (p_resetn == false) { 
-		m_iss.reset();
+		m_iss.reset(); // reset also the target_fsm
 		r_DCACHE_FSM = DCACHE_INIT; 
 		r_ICACHE_FSM = ICACHE_INIT; 
 		r_VCI_REQ_FSM = REQ_IDLE;
@@ -130,9 +130,26 @@ tmpl(void)::transition()
 		return;
 	} 
 
+	// Icache FSM : controls Instruction-cache interface from processor.
+	// It works as follow : 
+  // 1) check that there is a request,
+  // 2) a hit in cache will give the value in the same cycle, a miss
+  //    will stall the processor waiting for a response from memory (ICACHE_WAIT) state. 
+	// 3) When the response is here, come back to IDLE, in the next cycle the request will be
+	//    a hit in cache :-).
+
+	// Regarding requests : request are managed by the REQ/RSP_FSM which are trigerred by
+	// some signals  ICACHE_REQ , when request has been completed and
+	// the response received the IRSP_OK signal will be set unlocking (from ICACHE_WAIT state) the
+	// ICACHE_FSM. The response will be available in a buffer.
+  // This fsm also magnages the TLB for each request
+
+	// Regarding invalidations : Instruction cache cannot be invalidated, we suppose that there is
+	// no-self modifying code. In such cache, the processor should call a CPU_INVAL request (not supported yet,
+	// but easy to implement). 
 	switch((icache_fsm_state_e)r_ICACHE_FSM.read())
 	{
-		case ICACHE_INIT :
+		case ICACHE_INIT : // Init, reset TAG at reset time
 			s_ICACHE_TAG[r_ICACHE_CPT_INIT] = 0;
 			r_ICACHE_CPT_INIT = r_ICACHE_CPT_INIT - 1;
 			if (r_ICACHE_CPT_INIT == 0) { r_ICACHE_FSM = ICACHE_IDLE; }  
@@ -140,7 +157,9 @@ tmpl(void)::transition()
 
 		case ICACHE_IDLE :
 			if (!icache_req) break; // nothing to do
-			if (icache_hit) // the common case, return the instruction
+			if (icache_hit) // the common case, return the instruction in the SAME cycle,
+											// this is the case beacause m_iss.executeNCycles is called AFTER 
+											// setting the values hereafter (.valid, and .instruction).
 			{
 				icache_rsp_port.valid          = icache_hit;
 				icache_rsp_port.instruction    = s_ICACHE_DATA[icache_y][icache_x].read();
@@ -189,6 +208,35 @@ tmpl(void)::transition()
 			assert(false);
 			break;
 	} // end switch ICACHE_FSM
+
+	// Dcache FSM : controls data-cache interface from processor.
+	// It works as follow : 
+  // 1) check that there is a request,
+  // 2) if the Write-buffer is NOT empty, check if the request
+	//    is a write that is contiguous with the previous write-request
+	//    in order to create a "write burst", if yes, enqueue, if not, flush the buffer.
+	// 3) the Write-buffer is EMPTY (recently flushed or not), process the request.
+  // 4) a hit will give the value in the same cycle, a miss or uncached request
+  //    will stall the processor waiting for a response from memory (*_DWAIT) state. 
+	// 5) not wating anymore, give the value (if requested) to the processor.
+
+
+	// Regarding requests : request are managed by the REQ/RSP_FSM which are trigerred by
+	// some signals  DCACHE_REQ and DCACHE_FLUSH_WB_REQ, when request has been completed and
+	// the response received the DRSP_OK signal will be set unlocking (from *_WAIT state) the
+	// DCACHE_FSM. The response will be available in a buffer (depends on the request).
+  // This fsm also magnages the TLB for each request
+
+
+  // Regarding invalidations : invalidations are received on the target interface
+	// (managed by the INV_FSM). A signal is raised (DCACHE_RAM_INVAL_REQ), and we take it into
+	// account as soon as possible in IDLE state and when there is nothing to do in *_WAIT states.
+  // This is done in this way to avoid deadlocks (INV_FSM waits until invalidation has been processed
+	// for sending the response and thus ensure coherency).
+  // 
+  // TLB can be invalidated (request target the base address + 4), this is not blocking for the request REQ_FSM. 
+  // But, a signal is set (REQ_TLB_INVAL_SEND_ACK) wich is taken into account by the REQ_FSM as soon as
+  // possible to send a specific request to the memory node (a Tlb Invalidation Acknownledgment).
 
 	switch ((dcache_fsm_state_e)r_DCACHE_FSM.read())
 	{
@@ -521,6 +569,17 @@ tmpl(void)::transition()
 		}
 		m_iss.executeNCycles(1, icache_rsp_port, dcache_rsp_port, it);
 	}
+
+	// THis fsm sends requests over the interconnect. For each request it will compute the PHYSICAL address
+  // of a VIRTUAL address (ie. address requested by the processor). It has nothing to do with a MMU virtual address,
+  // an MMU can be added if necessary.
+  // To compute this address it will check for a valid transaltation in the TLB, if there is'nt any valid translation, a
+  // TLB_MISS request is sent, and when the TLB will be updated then the request will be issued.
+  // 
+  // Regarding : NACK's. A NACK (set on the rerror vci field) means that the target memory node is busy (e.g. due to a migration
+  // of the requested page), and that the request should be sent again (D/I RETRY signal). For the write-buffer this can be done
+  // thanks to our "special buffer" (a get() only moves a pointer inside the buffer and do not "pop out" the data, so data still
+	// there if necessary).
 
 	switch ((req_fsm_state_e)r_VCI_REQ_FSM.read())
 	{
@@ -1063,6 +1122,9 @@ tmpl(void)::transition()
 	// The VCI_INV controler
 	////////////////////////////////////////////////////////////////////////////
 
+ // This FSM manages invalidations. For the TLB invalidations we have 2 buffers because
+ // at most 2 invalidation requests can hit this node before we send back a TLB_INV_ACK
+ // request. Fix this if the system manages multiple page migration at the same time!
 	switch ((inv_fsm_state_e)r_VCI_INV_FSM.read()) {
 
 		case INV_IDLE:
@@ -1073,7 +1135,7 @@ tmpl(void)::transition()
 
 				if (p_t_vci.cmdval.read())
 				{ 
-					if (!m_segment.contains(dr_inv_address)){
+					if (!m_segment -> contains(dr_inv_address)){
 						std::cout << "> SoCLib segmentation fault" << std::endl; 
 						std::cout << "> A request has been sent by a component to a non-mapped address, it was cached by the target :" << name() << std::endl;
 						std::cout << " 		target @ : 0x" << std::hex << (int)dr_inv_address << std::endl;
