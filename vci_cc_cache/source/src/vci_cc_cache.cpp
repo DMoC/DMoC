@@ -163,8 +163,7 @@ tmpl(/**/)::VciCcCache(
 		r_DCACHE_CPT_INIT("DCACHE_CPT_INIT"),
 		r_ICACHE_CPT_INIT("ICACHE_CPT_INIT"),
 	m_id(procid),
-	ncycles(0),
-	m_table_cost(table_cost)
+	ncycles(0)
 {
 	assert(IS_POW_OF_2(icache_lines));
 	assert(IS_POW_OF_2(dcache_lines));

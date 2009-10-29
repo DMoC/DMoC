@@ -248,8 +248,6 @@ namespace caba {
 		// structural parameters
 		unsigned int m_id;
 		uint64_t ncycles;
-		unsigned int * m_table_cost;
-		addr_to_homeid_entry_t * m_home_addr_table;
 
 
 
