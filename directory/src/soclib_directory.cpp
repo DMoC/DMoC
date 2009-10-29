@@ -164,7 +164,7 @@ uint32_t SOCLIB_DIRECTORY::Get_nb_p(void){
 }
 
 int32_t SOCLIB_DIRECTORY::Get_next_id(void){
-	for (int32_t i = 0; i < NB_P ; i++)
+	for (uint32_t i = 0; i < NB_P ; i++)
 	{
 		if (Is_p(i)) return i;
 	}
