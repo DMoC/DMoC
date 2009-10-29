@@ -107,7 +107,7 @@ namespace caba{
 						addr_to_homeid_entry_t * home_addr_table,		// Used to convert node_id <-> memory_segment_base_address
 						unsigned int nb_m,													// Number of memory nodes (used in migration)
 						const soclib::common::MappingTable &mt,			// Mapping Table for read/write requets
-						const soclib::common::MappingTable &mt_inv, // Mapping Table for invalidation requests (alternative NoC). 
+						const soclib::common::MappingTable &mt_inv  // Mapping Table for invalidation requests (alternative NoC). 
 						);													
 
 				~VciMccRam();  
