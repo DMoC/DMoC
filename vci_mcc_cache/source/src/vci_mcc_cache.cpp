@@ -82,14 +82,11 @@ tmpl(/**/)::VciMccCache(
 		size_t dcache_words,
 		unsigned int procid,	
 		uint32_t migrability_mask,
-<<<<<<< HEAD:vci_mcc_cache/source/src/vci_mcc_cache.cpp
 		unsigned int * table_cost,
 		addr_to_homeid_entry_t * home_addr_table,
-		unsigned int nb_memory_nodes
-=======
+		unsigned int nb_memory_nodes,
 		const soclib::common::MappingTable &mt,
 		const soclib::common::MappingTable &mt_inv
->>>>>>> c3413d9... Dans les mcc_cache, mise en place de la gestion d'un "flat noc".:vci_mcc_cache/source/src/vci_mcc_cache.cpp
 		)
 : soclib::caba::BaseModule(insname),
 
