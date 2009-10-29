@@ -104,8 +104,8 @@ namespace caba{
 						const unsigned int nb_p,										// Number of processors in the system -> size of directory entry
 						const soclib::common::Loader &loader,				// Code loader
 						const unsigned int line_size,								// Configured line size. TODO : should/can be changed by vci_param::B ?
-						addr_to_homeid_entry_t * home_addr_table,		// Used to convert node_id <-> memory_segment_base_address
-						);													// Number of memory nodes (used in migration)
+						addr_to_homeid_entry_t * home_addr_table		// Used to convert node_id <-> memory_segment_base_address
+						);
 
 				~VciCcRam();  
 
