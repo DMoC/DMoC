@@ -55,12 +55,13 @@ namespace caba {
 			const unsigned int line_size,
 			unsigned int * table_cost,
 			addr_to_homeid_entry_t * home_addr_table,
-			unsigned int nb_m) :
+			unsigned int nb_m,
+			const soclib::common::MappingTable &mt,
+			const soclib::common::MappingTable &mt_inv
+) :
 		caba::BaseModule(insname),
 		m_loader(loader),
-		m_MapTab(mt),
-		const soclib::common::MappingTable &mt,
-		const soclib::common::MappingTable &mt_inv
+		m_MapTab(mt)
 	{
 
 		m_segment = new soclib::common::Segment(*(mt.getSegmentList(t_ident)).begin());
@@ -125,6 +126,7 @@ else
 	tmpl(/**/)::~VciCcRam()
 	{
 		delete c_core;
+		delete m_segment;
 	};
 
 }}
