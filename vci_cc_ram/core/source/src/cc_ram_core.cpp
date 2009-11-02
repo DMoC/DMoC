@@ -87,8 +87,8 @@ namespace caba {
 
 		std::list<soclib::common::Segment>::iterator     iter;
 
-		m_vci_fsm.on_read_write_nlock_tlb(on_read, on_write);
-		m_vci_fsm.on_is_busy_nlock_tlb(is_busy);
+		m_vci_fsm.on_read_write_nlock(on_read, on_write);
+		m_vci_fsm.on_is_busy_nlock(is_busy);
 
 		SC_METHOD (transition);
 		sensitive_pos << p_clk;

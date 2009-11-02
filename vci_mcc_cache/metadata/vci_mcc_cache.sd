@@ -25,7 +25,7 @@ Module('caba:vci_mcc_cache_sls',
 	Uses('caba:tlb_32_sls'),
 	Uses('common:types_sls'),
 	Uses('caba:mcc_globals_sls'),
-	Uses('common:iss2_sls')
+	Uses('common:iss2')
 	],
 	ports = [
 	Port('caba:vci_initiator', 'p_i_vci'),

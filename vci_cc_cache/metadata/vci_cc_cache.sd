@@ -23,7 +23,7 @@ Module('caba:vci_cc_cache_sls',
 	Uses('common:mapping_table'),
 	Uses('caba:generic_buffer_sls'),
 	Uses('caba:cc_globals_sls'),
-	Uses('common:iss2_sls')
+	Uses('common:iss2')
 	],
 	ports = [
 	Port('caba:vci_initiator', 'p_i_vci'),

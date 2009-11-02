@@ -52,31 +52,27 @@ class CcIdTable
 public :
 
 		// Register a new T-uplet for a coherent initiator (cc_cache etc..)
-    static void register_coherent_initiator(unsigned int i_index, soclib::common::IntTab t_index);
+    void register_coherent_initiator(unsigned int i_index, soclib::common::IntTab t_index);
 
 		// Register a new T-uplet for a non coherent initiator (fd_access etc..)
-    static void register_non_coherent_initiator(unsigned int i_index);
+    void register_non_coherent_initiator(unsigned int i_index);
 
 		// Retrieve a target IntTab from an Absolute Id
-    static soclib::common::IntTab translate_to_target(unsigned int id);
+    soclib::common::IntTab translate_to_target(unsigned int id);
 
 		// Retrieve an Absolute Id from a NoC_source_id.,
     // returns -1 if this initiator is "non coherent"
     // returns [0..max_coherent_id[ if the initiator is a "coherent" one.
-    static int translate_to_id(unsigned int i_index);
-
-    // Used to create the singleton
-    static CcIdTable * CreateCcIdTable(void);
-
-    ~CcIdTable(void);
-private :
-    static CcIdTable * unique_ref;
-    static std::map<unsigned int , soclib::common::IntTab > * relation_cc_id_target_map;
-    static std::map<unsigned int ,unsigned int > * relation_srcid_id_map;
-		static int coherent_id;
-		static unsigned int max_coherent_id;
+    int translate_to_id(unsigned int i_index);
 
     CcIdTable(void);
+    ~CcIdTable(void);
+private :
+    CcIdTable * unique_ref;
+    std::map<unsigned int , soclib::common::IntTab > * relation_cc_id_target_map;
+    std::map<unsigned int ,unsigned int > * relation_srcid_id_map;
+		int coherent_id;
+		unsigned int max_coherent_id;
 };
 
 

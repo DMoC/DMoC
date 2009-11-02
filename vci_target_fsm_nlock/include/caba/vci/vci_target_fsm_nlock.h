@@ -25,8 +25,8 @@
  *
  * Maintainers: nipo
  */
-#ifndef TARGET_FSM_HANDLER_NLOCKTLB_H
-#define TARGET_FSM_HANDLER_NLOCKTLB_H
+#ifndef TARGET_FSM_HANDLER_NLOCK_H
+#define TARGET_FSM_HANDLER_NLOCK_H
 
 #include <systemc>
 #include <vector>

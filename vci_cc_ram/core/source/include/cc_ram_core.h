@@ -36,7 +36,7 @@
 #include <fstream>
 
 #include "caba_base_module.h"
-#include "vci_target_fsm_nlock_tlb.h" // Special target_fsm that supports extended requests (TLB MISS's)
+#include "vci_target_fsm_nlock.h" // Special target_fsm that supports extended requests 
 #include "vci_initiator.h"
 
 #include "generic_fifo.h" 
@@ -149,7 +149,7 @@ namespace caba{
 				typename vci_param::data_t * m_fsm_data; // pointer to the data that will sent in response by the target fsm on a read,
 																								 // this pointer is saved because the data is provided in the mealy function.
 
-				soclib::caba::VciTargetFsmNlockTlb<vci_param,true,true> m_vci_fsm;
+				soclib::caba::VciTargetFsmNlock<vci_param,true,true> m_vci_fsm;
 
 #ifdef DEBUG_SRAM
 				soclib::common::Loader					m_loader;
