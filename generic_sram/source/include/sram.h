@@ -41,11 +41,6 @@
 #include "sram_param.h"
 #include <string>
 
-#ifdef DEBUG_RAM
-#define DRAMCOUT(x) if (x>= DEBUG_RAM_LEVEL) cout
-#else
-#define DRAMCOUT(x) if(0) cout
-#endif
 
 namespace soclib{
 namespace caba{
@@ -75,7 +70,6 @@ namespace caba{
 			
 			private :
 				// Data array
-#define DEBUG_SR
 #ifdef DEBUG_SR
 				uint32_t	* s_RAM;     
 #else
