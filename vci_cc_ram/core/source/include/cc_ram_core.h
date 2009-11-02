@@ -175,8 +175,8 @@ namespace caba{
 						sc_module_name insname,
 						const soclib::common::IntTab &i_ident,			// Source_id
 						const soclib::common::IntTab &t_ident,			// Target_id
-						const soclib::common::MappingTable &mt,			// Mapping Table for read/write requets
-						const soclib::common::MappingTable &mt_inv, // Mapping Table for invalidation requests (alternative NoC). 
+						const soclib::common::MappingTable * mt,			// Mapping Table for read/write requets
+						const soclib::common::MappingTable * mt_inv, // Mapping Table for invalidation requests (alternative NoC). 
 						soclib::common::CcIdTable  * cct,						// CacheCoherence Id Table to convert Source_id <-> Invalidation Target_address
 						const unsigned int nb_p,										// Number of processors in the system -> size of directory entry
 #ifdef DEBUG_SRAM

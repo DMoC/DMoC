@@ -81,8 +81,8 @@ tmpl(/**/)::VciCcCache(
 		size_t dcache_lines,
 		size_t dcache_words,
 		unsigned int procid,
-		const soclib::common::MappingTable &mt,
-		const soclib::common::MappingTable &mt_inv
+		const soclib::common::MappingTable * mt,
+		const soclib::common::MappingTable * mt_inv
 		)
 : soclib::caba::BaseModule(insname),
 
@@ -91,7 +91,7 @@ tmpl(/**/)::VciCcCache(
 	p_i_vci("p_i_vci"),
 	p_t_vci("p_t_vci"),
 
-	m_cacheability_table(mt.getCacheabilityTable()),
+	m_cacheability_table(mt -> getCacheabilityTable()),
 	m_iss(this->name(), procid),
 
 	s_dcache_lines(dcache_lines),
@@ -176,17 +176,17 @@ tmpl(/**/)::VciCcCache(
 	assert(dcache_lines <= 1024);
 
 	// Some initialisations :
-	if (&mt_inv == NULL) // Only one NoC is used to transport requests AND invalidations,
+	if (mt_inv == NULL) // Only one NoC is used to transport requests AND invalidations,
 											//it MUST not have "hierarchy" in order to avoid deadlocks
 	{
-		m_segment = new soclib::common::Segment(mt.getSegment(t_index));
+		m_segment = new soclib::common::Segment(mt -> getSegment(t_index));
 	}
 	else
 	{
-		m_segment = new soclib::common::Segment(mt_inv.getSegment(t_index));
+		m_segment = new soclib::common::Segment(mt_inv -> getSegment(t_index));
 	}
-	m_i_ident = mt.indexForId(i_index) ;  
-	m_t_ident = mt_inv.indexForId(t_index) ;  
+	m_i_ident = mt -> indexForId(i_index) ;  
+	m_t_ident = mt_inv -> indexForId(t_index) ;  
 	// Allocation arrays and buffers, use alloc_elems to allocate contiguously the data and enhance performances
 	// as an array, but calling a specific constructor for each object
 	s_DCACHE_DATA = new sc_signal<typename vci_param::data_t>*[dcache_lines];

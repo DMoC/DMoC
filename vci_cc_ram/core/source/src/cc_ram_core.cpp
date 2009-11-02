@@ -49,8 +49,8 @@ namespace caba {
 			sc_module_name insname,
 			const soclib::common::IntTab &i_ident,
 			const soclib::common::IntTab &t_ident,
-			const soclib::common::MappingTable &mt,
-			const soclib::common::MappingTable &mt_inv,
+			const soclib::common::MappingTable * mt,
+			const soclib::common::MappingTable * mt_inv,
 			soclib::common::CcIdTable * cct,
 			const unsigned int nb_p,
 #ifdef DEBUG_SRAM
@@ -67,19 +67,19 @@ namespace caba {
 		r_SAV_BLOCKNUM("SAV_BLOCKNUM"),
 		r_INV_BLOCKADDRESS("INV_BLOCKADDRESS"),
 		r_INV_TARGETADDRESS("INV_TARGETADDRESS"),
-		m_vci_fsm(p_t_vci, mt.getSegmentList(t_ident), (uint32_log2(PAGE_SIZE))),
+		m_vci_fsm(p_t_vci, mt -> getSegmentList(t_ident), (uint32_log2(PAGE_SIZE))),
 #ifdef DEBUG_SRAM
 		m_loader(loader),
 #endif
-		m_MapTab(mt),
-		m_MapTab_inv(mt_inv),
-		m_segment(*(mt.getSegmentList(t_ident)).begin())
+		m_MapTab(*mt),
+		m_MapTab_inv(*mt_inv),
+		m_segment(*(mt -> getSegmentList(t_ident)).begin())
 	{
 		m_cct = cct;
 		m_ADDR_WORD_SHIFT = uint32_log2(vci_param::B);
 		m_ADDR_BLOCK_SHIFT = uint32_log2(vci_param::B) + uint32_log2(line_size);
 		m_BLOCKMASK = (~0)<<(uint32_log2(line_size) + uint32_log2(vci_param::B));
-		m_I_IDENT = mt_inv.indexForId(i_ident);
+		m_I_IDENT = mt_inv -> indexForId(i_ident);
 		m_NB_PROCS = nb_p;
 		m_nbcycles = 0;
 
@@ -105,7 +105,7 @@ namespace caba {
 #endif
 
 		// Some checks
-		assert(mt.getSegmentList(t_ident).size() == 1);
+		assert(mt -> getSegmentList(t_ident).size() == 1);
 
 		// Data allocation/initialisation (Data, page table, directories).
 #ifdef DEBUG_SRAM

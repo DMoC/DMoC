@@ -267,8 +267,8 @@ namespace caba {
 				size_t dcache_lines,
 				size_t dcache_words, 
 				unsigned int procid,
-				const soclib::common::MappingTable &mt,
-				const soclib::common::MappingTable &mt_inv = NULL
+				const soclib::common::MappingTable * mt,
+				const soclib::common::MappingTable * mt_inv = NULL
 				);
 
 		//struct XCacheInfo getCacheInfo() const; Unimplemented yet

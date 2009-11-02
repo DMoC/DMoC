@@ -53,19 +53,19 @@ namespace caba {
 			const unsigned int nb_p,
 			const soclib::common::Loader &loader,
 			const unsigned int line_size,
-			const soclib::common::MappingTable &mt,
-			const soclib::common::MappingTable &mt_inv
+			const soclib::common::MappingTable * mt,
+			const soclib::common::MappingTable * mt_inv
 ) :
 		caba::BaseModule(insname),
 		m_loader(loader),
-		m_MapTab(mt)
+		m_MapTab(*mt)
 	{
 
-		m_segment = new soclib::common::Segment(*(mt.getSegmentList(t_ident)).begin());
+		m_segment = new soclib::common::Segment(*(mt -> getSegmentList(t_ident)).begin());
 
 		// Instanciate sub_modules
 #ifdef DEBUG_SRAM
-if (&mt_inv == NULL) // Only one NoC for requests and invalidation, pass &mt instead of &mt_inv as "Mapping table for invalidations"
+if (mt_inv == NULL) // Only one NoC for requests and invalidation, pass &mt instead of &mt_inv as "Mapping table for invalidations"
 {
 		c_core = new soclib::caba::CcRamCore<vci_param,sram_param>("c_core",i_ident,t_ident,mt,mt,cct,nb_p,loader,line_size);
 }
@@ -74,7 +74,7 @@ else
 		c_core = new soclib::caba::CcRamCore<vci_param,sram_param>("c_core",i_ident,t_ident,mt,mt_inv,cct,nb_p,loader,line_size);
 }
 #else
-if (&mt_inv == NULL) // Only one NoC for requests and invalidation, pass &mt instead of &mt_inv as "Mapping table for invalidations"
+if (mt_inv == NULL) // Only one NoC for requests and invalidation, pass &mt instead of &mt_inv as "Mapping table for invalidations"
 {
 		c_core = new soclib::caba::CcRamCore<vci_param,sram_param>("c_core",i_ident,t_ident,mt,mt,cct,nb_p,line_size);
 }

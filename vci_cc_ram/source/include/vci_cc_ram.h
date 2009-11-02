@@ -101,8 +101,8 @@ namespace caba{
 						const unsigned int nb_p,										// Number of processors in the system -> size of directory entry
 						const soclib::common::Loader &loader,				// Code loader
 						const unsigned int line_size,								// Configured line size. TODO : should/can be changed by vci_param::B ?
-						const soclib::common::MappingTable &mt,			// Mapping Table for read/write requets
-						const soclib::common::MappingTable &mt_inv = NULL // Mapping Table for invalidation requests (alternative NoC). 
+						const soclib::common::MappingTable * mt,			// Mapping Table for read/write requets
+						const soclib::common::MappingTable * mt_inv = NULL // Mapping Table for invalidation requests (alternative NoC). 
 						);
 
 				~VciCcRam();  
