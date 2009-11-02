@@ -105,7 +105,10 @@ namespace caba {
 #endif
 
 		// Some checks
-		assert(mt -> getSegmentList(t_ident).size() == 1);
+		for ( size_t i=0; i<m_vci_fsm.nbSegments(); ++i )
+		{
+			assert(m_vci_fsm.getSize(i) <= m_segment.size());
+		}
 
 		// Data allocation/initialisation (Data, page table, directories).
 #ifdef DEBUG_SRAM

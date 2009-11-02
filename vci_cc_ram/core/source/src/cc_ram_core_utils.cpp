@@ -63,7 +63,6 @@ namespace caba {
 		unsigned int source_id = m_vci_fsm.currentSourceId();
 		int blocknum = (addr  >> m_ADDR_BLOCK_SHIFT);
 
-		assert(seg == 0);
 
 		DRAMCOUT(0) << name() << " [RAM_WRITE] " << endl;
 
@@ -117,7 +116,6 @@ namespace caba {
 		unsigned int source_id = m_vci_fsm.currentSourceId();
 		int blocknum = (addr  >> m_ADDR_BLOCK_SHIFT);
 
-		assert(seg == 0);
 
 		r_IN_TRANSACTION = !eop;
 #ifdef DEADLOCK_NACK_POLICY
