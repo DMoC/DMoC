@@ -55,7 +55,7 @@ namespace caba {
 			for ( size_t addr = 0; addr < iter -> size()/sram_param::B; ++addr )
 			{
 				temp[addr] = le_to_machine(temp[addr]);
-				s_RAM[addr] = temp[addr];
+				s_RAM[i][addr] = temp[addr];
 			}
 			delete [] temp;
 		}
@@ -64,7 +64,7 @@ namespace caba {
 
 
 	/***********************************************************************************************/
-	/* Read/Write method  @ s_RAM[offset], take care of byte-enable field                          */
+	/* Read/Write method  @ s_RAM[bank][offset], take care of byte-enable field                          */
 	/***********************************************************************************************/
 	tmpl(typename sram_param::data_t)::read_write_sram(
 									typename sram_param::bk_t bank_sel,

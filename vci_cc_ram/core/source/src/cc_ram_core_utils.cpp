@@ -87,7 +87,7 @@ namespace caba {
 		m_sram_bk = seg;
 
 		if (node_id == -1) return true; // the initiator does not support coherence (ex. fd_access).
-		if (s_DIRECTORY[blocknum].Is_Other(node_id) && eop )
+		if (s_DIRECTORY[seg][blocknum].Is_Other(node_id) && eop )
 			// Send invalidation only if it is the last cell of the paquet
 			// in order to avoid deadlocks, report to TODO point for an explanation 
 		{ 
@@ -138,7 +138,7 @@ namespace caba {
 		if (node_id == -1) return true; // the initiator does not support coherence (ex. fd_access).
 		assert((unsigned int)node_id < m_NB_PROCS); // if not, an initiator which is not a processor but support coherence has sent
 																	// this request.
-		if ((s_DIRECTORY[blocknum].Is_p(node_id)==false) &&  eop) // Update the directory
+		if ((s_DIRECTORY[seg][blocknum].Is_p(node_id)==false) &&  eop) // Update the directory
 		{
 			r_RAM_FSM = RAM_DIRUPD;
 			r_SAV_ADDRESS = m_vci_fsm.getBase(seg)+addr;

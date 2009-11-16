@@ -91,6 +91,7 @@ namespace caba {
 			s_RAM[segnum] = new uint32_t [iter -> size()/sram_param::B]; 
 #else
 			s_RAM[segnum] = new typename sram_param::data_t [iter -> size()/sram_param::B]; 
+			std::cout << name() << "new SRAM bank @" << std::hex <<  iter -> baseAddress() << " - " << (iter -> size()) << std::endl;
 #endif
 		}
 
