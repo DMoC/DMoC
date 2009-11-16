@@ -34,25 +34,6 @@
 namespace soclib {
 namespace caba {
 
-#ifdef DEBUG_SRAM
-	/***********************************************************************************************/
-	/* Reload code from binary, take care of endianness of host platform                           */
-	/***********************************************************************************************/
-	tmpl(void)::reload()
-	{
-		// TODO : hack, 32bits temporary array used to load a 32bits elf-binary.
-                // problem : sc_uint<32> is 8 bytes on a 64bits machine and m_loader.load
-                // don't care about this and just copy the 32bits code (two words per data_t cells!)
-		uint32_t * temp = new uint32_t [m_segment.size()/vci_param::B];
-		m_loader.load(temp, m_segment.baseAddress(), m_segment.size());
-		for ( size_t addr = 0; addr < m_segment.size()/vci_param::B; ++addr )
-		{
-			temp[addr] = le_to_machine(temp[addr]);
-			s_RAM[addr] = temp[addr];
-		}
-		delete [] temp;
-	}
-#endif
 
 	/***********************************************************************************************/
 	/* Read/Write method  @ tab[index], take care of byte-enable field                             */
@@ -61,9 +42,6 @@ namespace caba {
 			typename vci_param::data_t wdata, typename vci_param::be_t be,
 			typename vci_param::cmd_t cmd)
 	{
-#ifndef DEBUG_SRAM
-		assert(false); // deprecated
-#endif
 		unsigned int mask = 0;
 		if (cmd == vci_param::CMD_READ) {    // read
 			return(tab[index]);

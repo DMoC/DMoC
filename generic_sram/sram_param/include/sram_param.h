@@ -49,6 +49,7 @@ template<
 		typedef sc_dt::sc_uint<data_byte_width> be_t;
 		typedef sc_dt::sc_uint<data_byte_width*8> data_t;
 		typedef sc_dt::sc_uint<addr_bit_width> addr_t;
+		typedef sc_dt::sc_uint<4> bk_t;
 		static const unsigned int B = data_byte_width;
 		static const unsigned int N = addr_bit_width;
 	};

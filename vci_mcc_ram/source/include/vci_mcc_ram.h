@@ -72,9 +72,10 @@ namespace caba{
 
 				soclib::common::Loader					m_loader;
 				soclib::common::MappingTable		m_MapTab;			
-				soclib::common::Segment					* m_segment;    // Only 1 segment on this version (page migration allowed).
+				std::list<soclib::common::Segment>					* m_segment_list;    // A segment list 
 
 				// Interconnection signals : c_core -> c_sram 
+				sc_signal<typename sram_param::bk_t>   s_bk_core2sram;
 				sc_signal<bool>   s_ce_core2sram;
 				sc_signal<bool>   s_oe_core2sram;
 				sc_signal<bool>   s_we_core2sram;
@@ -108,7 +109,7 @@ namespace caba{
 						unsigned int nb_m,													// Number of memory nodes (used in migration)
 						const soclib::common::MappingTable * mt,			// Mapping Table for read/write requets
 						const soclib::common::MappingTable * mt_inv  // Mapping Table for invalidation requests (alternative NoC). 
-						);													
+						);
 
 				~VciMccRam();  
 

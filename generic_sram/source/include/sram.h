@@ -37,6 +37,8 @@
 
 
 #include "caba_base_module.h"
+#include "loader.h"
+#include "segment.h"
 
 #include "sram_param.h"
 #include <string>
@@ -57,6 +59,7 @@ namespace caba{
 			public :
 
 				// IO PORTS
+				sc_in<typename sram_param::bk_t>   p_bk_sel;
 				sc_in<bool>   p_ce;
 				sc_in<bool>   p_oe;
 				sc_in<bool>   p_we;
@@ -71,25 +74,30 @@ namespace caba{
 			private :
 				// Data array
 #ifdef DEBUG_SR
-				uint32_t	* s_RAM;     
+				uint32_t	** s_RAM;     
 #else
-				typename  sram_param::data_t	* s_RAM;     
+				typename  sram_param::data_t	** s_RAM;     
 #endif
 
 
 				unsigned int	m_ADDR_WORD_SHIFT;	// data_index = address >> m_ADDR_WORD_SHIFT (index of data in r_RAM) 
-				unsigned int	m_size_bytes;	 			// size of this Sram bank
+				unsigned int	* m_size_bytes;	 			// size of SRAM bank, sizes are different to optimize simulation ressources
+				unsigned int  m_nb_banks;
+				soclib::common::Loader m_loader;
+				std::list<soclib::common::Segment>					* m_segment_list;    // A segment list 
 
 
 			public :
 				SRam (
 						sc_module_name insname,
-						unsigned int size_bytes
+						std::list<soclib::common::Segment> * seg_list,
+						const soclib::common::Loader &loader
 						);													
 
 				~SRam();  
 
-				bool set_sram_content(void * source, unsigned int nb_bytes); // success returns true, error returns false
+				// Used to load code at boot time
+				bool reload( void );
 
 #ifdef CDB_COMPONENT_IF_H
 				// CDB overloaded virtual method's
@@ -108,10 +116,12 @@ namespace caba{
 				void genMealy();
 
 				typename sram_param::data_t read_write_sram(
+									typename sram_param::bk_t bank_sel,
 									typename sram_param::addr_t offset,
 									typename sram_param::data_t wdata,
 									bool we, bool oe,
 									typename sram_param::be_t be);
+
 
 #ifdef CDB_COMPONENT_IF_H
 				// CDB utilities method's

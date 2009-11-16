@@ -50,9 +50,6 @@ namespace caba {
 		switch (r_RAM_FSM.read()) {
 
 			case RAM_IDLE :
-#ifdef DEBUG_SRAM
-				m_vci_fsm . genMoore();
-#endif
 				break;
 
 #if 0
@@ -140,6 +137,7 @@ namespace caba {
 
 		} // end switch r_INV_FSM
 
+		p_sram_bk   = m_sram_bk;
 		p_sram_ce   = m_sram_ce;
 		p_sram_oe   = m_sram_oe;
 		p_sram_we   = m_sram_we;

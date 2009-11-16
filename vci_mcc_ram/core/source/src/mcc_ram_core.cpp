@@ -97,7 +97,6 @@ namespace caba {
 
 		CTOR_OUT
 
-		std::list<soclib::common::Segment>::iterator     iter;
 
 		m_vci_fsm.on_read_write_nlock_tlb(on_read, on_write);
 		m_vci_fsm.on_tlb_miss_ack_nlock_tlb(on_tlb_miss, on_tlb_ack);

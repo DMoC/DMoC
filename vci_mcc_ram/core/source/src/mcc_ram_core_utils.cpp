@@ -135,6 +135,7 @@ namespace caba {
 		m_sram_oe = false;
 		m_sram_we = true;
 		m_sram_ce = true;
+		m_sram_bk = seg;
 
 		if (node_id == -1) return true; // the initiator does not support coherence (ex. fd_access).
 		if (s_DIRECTORY[blocknum].Is_Other(node_id) && eop )
@@ -186,6 +187,7 @@ namespace caba {
 		m_sram_oe = true;
 		m_sram_we = false;
 		m_sram_ce = true;
+		m_sram_bk = seg;
 		
 
 		m_fsm_data = &data; // save the data location pointer, will be set in genMealy function.

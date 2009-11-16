@@ -59,14 +59,13 @@ namespace caba {
 			unsigned int nb_m,
 			const soclib::common::MappingTable * mt,
 			const soclib::common::MappingTable * mt_inv
-
 ) :
 		caba::BaseModule(insname),
 		m_loader(loader),
 		m_MapTab(*mt)
 	{
 
-		m_segment = new soclib::common::Segment(*(mt->getSegmentList(t_ident)).begin());
+		m_segment_list = new std::list<soclib::common::Segment>(mt -> getSegmentList(t_ident));
 
 		// Instanciate sub_modules
 #ifdef DEBUG_SRAM
@@ -87,12 +86,13 @@ else
 {
 		c_core = new soclib::caba::MccRamCore<vci_param,sram_param>("c_core",node_zero,i_ident,t_ident,mt,mt_inv,cct,nb_p,line_size,table_cost,home_addr_table,nb_m);
 }
-		c_sram_32 = new soclib::caba::SRam<sram_param>("c_sram",(unsigned int)m_segment -> size());
+		c_sram_32 = new soclib::caba::SRam<sram_param>("c_sram",m_segment_list, loader);
 #endif
 
 		// some checks, we use a 32bits Sram and for now we don't manage "address conversions". 
 		assert(vci_param::N == 32);
 		assert(vci_param::B == 4);
+		assert(m_segment_list -> size() == 1); // Only one segment allowed per module
 
 		// connect them
 		c_core -> p_clk(p_clk);
@@ -100,6 +100,7 @@ else
 		c_core -> p_t_vci(p_t_vci);
 		c_core -> p_i_vci(p_i_vci);
 
+		c_core -> p_sram_bk(s_bk_core2sram);
 		c_core -> p_sram_ce(s_ce_core2sram);
 		c_core -> p_sram_oe(s_oe_core2sram);
 		c_core -> p_sram_we(s_we_core2sram);
@@ -110,6 +111,7 @@ else
 		c_core -> p_sram_ack(s_ack_core2sram);
 
 #ifndef DEBUG_SRAM
+		c_sram_32 -> p_bk_sel(s_bk_core2sram);
 		c_sram_32 -> p_ce(s_ce_core2sram);
 		c_sram_32 -> p_oe(s_oe_core2sram);
 		c_sram_32 -> p_we(s_we_core2sram);
@@ -128,7 +130,7 @@ else
 	tmpl(/**/)::~VciMccRam()
 	{
 		delete c_core;
-		delete m_segment;
+		delete m_segment_list;
 	};
 
 }}

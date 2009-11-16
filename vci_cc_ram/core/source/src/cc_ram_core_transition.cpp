@@ -57,9 +57,6 @@ namespace caba {
 			r_INV_FSM = RAM_INV_IDLE;
 			r_INV_BLOCKSTATE.init(m_NB_PROCS);
 			r_IN_TRANSACTION = false;
-#ifdef DEBUG_SRAM
-			reload();
-#endif
 			return;
 		} 
 
@@ -138,7 +135,7 @@ namespace caba {
 					{
 						unsigned int blocknum;
 						DRAMCOUT(0) << name() << " [RAM_DIRUPDT] " << endl;
-						blocknum = (((r_SAV_ADDRESS.read() - m_segment.baseAddress()) & m_BLOCKMASK) >> m_ADDR_BLOCK_SHIFT);
+						blocknum = (((r_SAV_ADDRESS.read() - m_vci_fsm.getBase(r_SAV_SEGNUM.read())) & m_BLOCKMASK) >> m_ADDR_BLOCK_SHIFT);
 						s_DIRECTORY[blocknum].Set_p(m_cct->translate_to_id(r_SAV_SCRID.read()));
 						r_RAM_FSM = RAM_IDLE;
 						break;
@@ -147,7 +144,7 @@ namespace caba {
 				case RAM_DATA_INVAL : // and directory update
 					{
 						DRAMCOUT(1) << name() << " [RAM_DATA_INVAL] " << endl;
-						unsigned int blocknum = (((r_SAV_ADDRESS.read() - m_segment.baseAddress()) & m_BLOCKMASK) >> m_ADDR_BLOCK_SHIFT);
+						unsigned int blocknum = (((r_SAV_ADDRESS.read() - m_vci_fsm.getBase(r_SAV_SEGNUM.read())) & m_BLOCKMASK) >> m_ADDR_BLOCK_SHIFT);
 						bool save_p = s_DIRECTORY[blocknum].Is_p(m_cct->translate_to_id(r_SAV_SCRID.read()));
 
 						if((inv_fsm_state_e)r_INV_FSM.read() == RAM_INV_IDLE)

@@ -51,20 +51,10 @@ namespace caba {
 			switch (sram_param::B)
 			{
 				case 4 :
-					{
-						uint32_t * temp;
-						temp = new uint32_t [m_segment -> size()/sram_param::B];
-						m_loader.load(temp, m_segment -> baseAddress(), m_segment -> size());
-						for ( size_t addr = 0; addr < m_segment -> size()/sram_param::B; ++addr )
-						{
-							temp[addr] = le_to_machine(temp[addr]);
-						}
-						assert(c_sram_32 -> set_sram_content( (void *) temp ,(unsigned int) m_segment -> size()));
-						delete [] temp;
-					}
+					if(!(c_sram_32 -> reload()))
+						assert(false);
 					break;
 				default :
-					std::cout << "unsupported data width in vci_mmc_ram" << std::endl;
 					assert(false);
 					break;
 			}

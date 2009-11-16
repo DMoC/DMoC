@@ -45,12 +45,6 @@
 #include "soclib_directory.h" 
 #include <string>
 
-#if 0
-#define DEBUG_SRAM
-#endif
-#ifdef DEBUG_SRAM
-#include "loader.h"
-#endif
 
 #ifdef DEBUG_RAM
 #define DRAMCOUT(x) if (x>= DEBUG_RAM_LEVEL) cout
@@ -91,6 +85,7 @@ namespace caba{
 				soclib::caba::VciInitiator<vci_param>  	p_i_vci;  // Initiator interface (used to send invalidations)
 
 				// S-RAM interface
+				sc_out<typename sram_param::bk_t>   p_sram_bk;
 				sc_out<bool>   p_sram_ce;
 				sc_out<bool>   p_sram_oe;
 				sc_out<bool>   p_sram_we;
@@ -125,39 +120,28 @@ namespace caba{
 				bool													m_sram_oe;
 				bool													m_sram_we;
 				bool													m_sram_ce;
+				typename sram_param::bk_t			m_sram_bk;
 			
 
 				// Vci invalidation request
 				sc_signal<typename vci_param::addr_t>	r_INV_BLOCKADDRESS;
 				sc_signal<typename vci_param::addr_t>	r_INV_TARGETADDRESS;
 
-				// Data , page table , directories (data, page table, poison flag) implemented in S-RAM
-#ifdef DEBUG_SRAM
-				typename  vci_param::data_t	* s_RAM; // this doesnt work on a 64bit machine due to "m_loader.load"
-									 // wich merely cast on void * the s_RAM and memcpy the data (32bits elf
-									 // format in a mips32 platform)
-#endif
-				SOCLIB_DIRECTORY						* s_DIRECTORY;	
+				// directory
+				SOCLIB_DIRECTORY						** s_DIRECTORY;	
 
 
 				//  STRUCTURAL PARAMETERS
 			private :
 
-#ifdef DEBUG_SRAM
-				typename vci_param::data_t m_should_get; // pointer to the data that will sent in response by the target fsm on a read,
-#endif
 				typename vci_param::data_t * m_fsm_data; // pointer to the data that will sent in response by the target fsm on a read,
 																								 // this pointer is saved because the data is provided in the mealy function.
 
 				soclib::caba::VciTargetFsmNlock<vci_param,true,true> m_vci_fsm;
 
-#ifdef DEBUG_SRAM
-				soclib::common::Loader					m_loader;
-#endif
 				soclib::common::MappingTable		m_MapTab;			// Request/response network
 				soclib::common::MappingTable		m_MapTab_inv; // invalidation network
 				soclib::common::CcIdTable *			m_cct;				// used for invalidations, used to convert source_id to Target address 
-				soclib::common::Segment					m_segment;    // Only 1 segment on this version (page migration allowed).
 
 				unsigned int	m_ADDR_WORD_SHIFT;	// data_index = address >> m_ADDR_WORD_SHIFT (index of data in r_RAM) 
 				unsigned int	m_ADDR_BLOCK_SHIFT; // directory_index = address >> m_ADDR_BLOCK_SHIFT 
@@ -179,9 +163,6 @@ namespace caba{
 						const soclib::common::MappingTable * mt_inv, // Mapping Table for invalidation requests (alternative NoC). 
 						soclib::common::CcIdTable  * cct,						// CacheCoherence Id Table to convert Source_id <-> Invalidation Target_address
 						const unsigned int nb_p,										// Number of processors in the system -> size of directory entry
-#ifdef DEBUG_SRAM
-						const soclib::common::Loader &loader,				// Code loader
-#endif
 						const unsigned int line_size);								// Configured line size. TODO : should/can be changed by vci_param::B ?
 
 				~CcRamCore();  
@@ -208,10 +189,6 @@ namespace caba{
 						typename vci_param::data_t wdata, typename vci_param::be_t be,
 						typename vci_param::cmd_t cmd
 						);
-#ifdef DEBUG_SRAM
-				void reload();
-#endif
-
 		};  
 }}
 #endif

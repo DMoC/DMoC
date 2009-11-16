@@ -61,29 +61,18 @@ namespace caba {
 		m_MapTab(*mt)
 	{
 
-		m_segment = new soclib::common::Segment(*(mt -> getSegmentList(t_ident)).begin());
+		m_segment_list = new std::list<soclib::common::Segment>(mt -> getSegmentList(t_ident));
 
 		// Instanciate sub_modules
-#ifdef DEBUG_SRAM
-if (mt_inv == NULL) // Only one NoC for requests and invalidation, pass &mt instead of &mt_inv as "Mapping table for invalidations"
-{
-		c_core = new soclib::caba::CcRamCore<vci_param,sram_param>("c_core",i_ident,t_ident,mt,mt,cct,nb_p,loader,line_size);
-}
-else
-{
-		c_core = new soclib::caba::CcRamCore<vci_param,sram_param>("c_core",i_ident,t_ident,mt,mt_inv,cct,nb_p,loader,line_size);
-}
-#else
-if (mt_inv == NULL) // Only one NoC for requests and invalidation, pass &mt instead of &mt_inv as "Mapping table for invalidations"
-{
-		c_core = new soclib::caba::CcRamCore<vci_param,sram_param>("c_core",i_ident,t_ident,mt,mt,cct,nb_p,line_size);
-}
-else
-{
-		c_core = new soclib::caba::CcRamCore<vci_param,sram_param>("c_core",i_ident,t_ident,mt,mt_inv,cct,nb_p,line_size);
-}
-		c_sram_32 = new soclib::caba::SRam<sram_param>("c_sram",(unsigned int)m_segment -> size());
-#endif
+		if (mt_inv == NULL) // Only one NoC for requests and invalidation, pass &mt instead of &mt_inv as "Mapping table for invalidations"
+		{
+			c_core = new soclib::caba::CcRamCore<vci_param,sram_param>("c_core",i_ident,t_ident,mt,mt,cct,nb_p,line_size);
+		}
+		else
+		{
+			c_core = new soclib::caba::CcRamCore<vci_param,sram_param>("c_core",i_ident,t_ident,mt,mt_inv,cct,nb_p,line_size);
+		}
+		c_sram_32 = new soclib::caba::SRam<sram_param>("c_sram", m_segment_list, loader);
 
 		// some checks, we use a 32bits Sram and for now we don't manage "address conversions". 
 		assert(vci_param::N == 32);
@@ -95,6 +84,7 @@ else
 		c_core -> p_t_vci(p_t_vci);
 		c_core -> p_i_vci(p_i_vci);
 
+		c_core -> p_sram_bk(s_bk_core2sram);
 		c_core -> p_sram_ce(s_ce_core2sram);
 		c_core -> p_sram_oe(s_oe_core2sram);
 		c_core -> p_sram_we(s_we_core2sram);
@@ -104,7 +94,7 @@ else
 		c_core -> p_sram_din(s_dout_core2sram);
 		c_core -> p_sram_ack(s_ack_core2sram);
 
-#ifndef DEBUG_SRAM
+		c_sram_32 -> p_bk_sel(s_bk_core2sram);
 		c_sram_32 -> p_ce(s_ce_core2sram);
 		c_sram_32 -> p_oe(s_oe_core2sram);
 		c_sram_32 -> p_we(s_we_core2sram);
@@ -113,7 +103,6 @@ else
 		c_sram_32 -> p_din(s_din_core2sram);
 		c_sram_32 -> p_dout(s_dout_core2sram);
 		c_sram_32 -> p_ack(s_ack_core2sram);
-#endif
 
 		SC_METHOD (Transition);
 		sensitive_pos << p_clk;
@@ -123,7 +112,7 @@ else
 	tmpl(/**/)::~VciCcRam()
 	{
 		delete c_core;
-		delete m_segment;
+		delete m_segment_list;
 	};
 
 }}

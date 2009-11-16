@@ -64,16 +64,16 @@ namespace caba{
 
 			private :
 				typedef SramParam<4,32> sram_param ;
-#ifndef DEBUG_SRAM
+
 				soclib::caba::SRam<sram_param> * c_sram_32; // 32bits Sram
-#endif
 				soclib::caba::CcRamCore<vci_param,sram_param> * c_core;
 
 				soclib::common::Loader					m_loader;
 				soclib::common::MappingTable		m_MapTab;			
-				soclib::common::Segment					* m_segment;    // Only 1 segment on this version (page migration allowed).
+				std::list<soclib::common::Segment>					* m_segment_list;    // A segment list 
 
 				// Interconnection signals : c_core -> c_sram 
+				sc_signal<typename sram_param::bk_t>   s_bk_core2sram;
 				sc_signal<bool>   s_ce_core2sram;
 				sc_signal<bool>   s_oe_core2sram;
 				sc_signal<bool>   s_we_core2sram;

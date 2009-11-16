@@ -194,6 +194,7 @@ msldfj
 
 		} // end switch r_INV_FSM
 
+		p_sram_bk   = m_sram_bk;
 		p_sram_ce   = m_sram_ce;
 		p_sram_oe   = m_sram_oe;
 		p_sram_we   = m_sram_we;

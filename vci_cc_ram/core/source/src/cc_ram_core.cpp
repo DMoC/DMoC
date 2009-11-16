@@ -53,9 +53,6 @@ namespace caba {
 			const soclib::common::MappingTable * mt_inv,
 			soclib::common::CcIdTable * cct,
 			const unsigned int nb_p,
-#ifdef DEBUG_SRAM
-			const soclib::common::Loader &loader,				// Code loader
-#endif
 			const unsigned int line_size) :
 		caba::BaseModule(insname),
 		r_RAM_FSM("RAM_FSM"),
@@ -68,12 +65,8 @@ namespace caba {
 		r_INV_BLOCKADDRESS("INV_BLOCKADDRESS"),
 		r_INV_TARGETADDRESS("INV_TARGETADDRESS"),
 		m_vci_fsm(p_t_vci, mt -> getSegmentList(t_ident), (uint32_log2(PAGE_SIZE))),
-#ifdef DEBUG_SRAM
-		m_loader(loader),
-#endif
 		m_MapTab(*mt),
-		m_MapTab_inv(*mt_inv),
-		m_segment(*(mt -> getSegmentList(t_ident)).begin())
+		m_MapTab_inv(*mt_inv)
 	{
 		m_cct = cct;
 		m_ADDR_WORD_SHIFT = uint32_log2(vci_param::B);
@@ -105,28 +98,26 @@ namespace caba {
 #endif
 
 		// Some checks
+		s_DIRECTORY = new SOCLIB_DIRECTORY * [m_vci_fsm.nbSegments()];
 		for ( size_t i=0; i<m_vci_fsm.nbSegments(); ++i )
 		{
-			assert(m_vci_fsm.getSize(i) <= m_segment.size());
-		}
-
-		// Data allocation/initialisation (Data, page table, directories).
-#ifdef DEBUG_SRAM
-		s_RAM = new typename vci_param::data_t [m_segment.size() >> m_ADDR_WORD_SHIFT];
-#endif
-		s_DIRECTORY = new SOCLIB_DIRECTORY [m_segment.size() >> m_ADDR_BLOCK_SHIFT];
-		for (unsigned int i = 0; i < (m_segment.size() >> m_ADDR_BLOCK_SHIFT); i++)
-		{
-			s_DIRECTORY[i].init(m_NB_PROCS);
+			assert(m_vci_fsm.getSize(i) <= m_vci_fsm.getSize(i));
+			// Data allocation/initialisation (Data, page table, directories).
+			s_DIRECTORY[i] = new SOCLIB_DIRECTORY [m_vci_fsm.getSize(i) >> m_ADDR_BLOCK_SHIFT];
+			for (unsigned int cell = 0; cell < (m_vci_fsm.getSize(i) >> m_ADDR_BLOCK_SHIFT); cell++)
+			{
+				s_DIRECTORY[i][cell].init(m_NB_PROCS);
+			}
 		}
 	}; // end constructor
 
 	tmpl(/**/)::~CcRamCore()
 	{
 		DTOR_OUT
-#ifdef DEBUG_SRAM
-		delete [] s_RAM;
-#endif
+		for ( size_t i=0; i<m_vci_fsm.nbSegments(); ++i )
+		{
+			delete [] s_DIRECTORY[i];
+		}
 		delete [] s_DIRECTORY;
 
 	};

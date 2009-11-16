@@ -104,6 +104,7 @@ namespace caba{
 				soclib::caba::VciInitiator<vci_param>  	p_i_vci;  // Initiator interface (used to send invalidations)
 
 				// S-RAM interface
+				sc_out<typename sram_param::bk_t>   p_sram_bk;
 				sc_out<bool>   p_sram_ce;
 				sc_out<bool>   p_sram_oe;
 				sc_out<bool>   p_sram_we;
@@ -155,6 +156,7 @@ namespace caba{
 				bool													m_sram_oe;
 				bool													m_sram_we;
 				bool													m_sram_ce;
+				typename sram_param::bk_t			m_sram_bk;
 			
 
 				// Vci invalidation request

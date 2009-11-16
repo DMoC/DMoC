@@ -46,7 +46,7 @@ namespace caba {
 	{
 		if (p_ce.read()) // chip enable is up
 		{
-			p_dout = read_write_sram(p_addr.read(), p_din.read(), p_we.read(), p_oe.read(),p_be.read());
+			p_dout = read_write_sram(p_bk_sel.read(), p_addr.read(), p_din.read(), p_we.read(), p_oe.read(),p_be.read());
 			p_ack = p_oe.read();
 		}
 		else
