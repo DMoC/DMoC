@@ -88,7 +88,7 @@ using namespace sc_core;
 		{
 			if (r_ptw != m_depth) {
 				r_fill_state = r_fill_state + 1;
-				r_ptw +=  1;
+				r_ptw = r_ptw + 1;
 				m_data[r_ptw] = din;
 			}
 		}
@@ -97,7 +97,7 @@ using namespace sc_core;
 		{
 			if (r_fill_state != 0) {
 				r_fill_state = r_fill_state - 1;
-				r_ptr += 1;
+				r_ptr =  r_ptr + 1;
 			}
 		}
 

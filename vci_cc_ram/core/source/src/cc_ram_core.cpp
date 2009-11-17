@@ -76,6 +76,10 @@ namespace caba {
 		m_NB_PROCS = nb_p;
 		m_nbcycles = 0;
 
+		m_sram_oe = false;
+		m_sram_we = false;
+		m_sram_ce = false;
+
 		CTOR_OUT
 
 		std::list<soclib::common::Segment>::iterator     iter;
