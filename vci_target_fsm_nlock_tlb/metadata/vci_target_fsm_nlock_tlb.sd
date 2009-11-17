@@ -14,6 +14,7 @@ Module('caba:vci_target_fsm_nlock_tlb_sls',
 		Uses('common:mapping_table'),
 		Uses('common:linked_access_buffer_mcc_sls', addr_t = parameter.StringExt('uint%s_t', parameter.Reference('addr_size')), id_t = 'unsigned int'),
 		Uses('caba:base_module'),
+		Uses('caba:vci_buffers'),
 		],
 #	   debug = True,
 )
