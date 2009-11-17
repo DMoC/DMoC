@@ -45,7 +45,6 @@ namespace caba {
 	{
 		if (!p_resetn.read()) // Reset_N signal
 		{
-#ifndef DEBUG_SRAM
 			// The code load is done at reset (and not in the constructor) to allow a
 			// clean reset of the system at any time.
 			switch (sram_param::B)
@@ -56,9 +55,10 @@ namespace caba {
 					break;
 				default :
 					assert(false);
+					// Not a 32 bits modeled architecture, must rewrite or support other architecture
+					// int the reload method of generic_sram component.
 					break;
 			}
-#endif
 		}
 	};
 }}

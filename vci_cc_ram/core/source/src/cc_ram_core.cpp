@@ -91,11 +91,9 @@ namespace caba {
 		sensitive_neg << p_clk;
 		dont_initialize();
 
-#ifndef DEBUG_SRAM
 		SC_METHOD (genMealy);
 		sensitive << p_sram_ack;
 		dont_initialize();
-#endif
 
 		// Some checks
 		s_DIRECTORY = new SOCLIB_DIRECTORY * [m_vci_fsm.nbSegments()];

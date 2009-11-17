@@ -159,11 +159,11 @@ namespace caba{
 						sc_module_name insname,
 						const soclib::common::IntTab &i_ident,			// Source_id
 						const soclib::common::IntTab &t_ident,			// Target_id
-						const soclib::common::MappingTable * mt,			// Mapping Table for read/write requets
+						const soclib::common::MappingTable * mt,		// Mapping Table for read/write requets
 						const soclib::common::MappingTable * mt_inv, // Mapping Table for invalidation requests (alternative NoC). 
 						soclib::common::CcIdTable  * cct,						// CacheCoherence Id Table to convert Source_id <-> Invalidation Target_address
 						const unsigned int nb_p,										// Number of processors in the system -> size of directory entry
-						const unsigned int line_size);								// Configured line size. TODO : should/can be changed by vci_param::B ?
+						const unsigned int line_size);							// Configured line size. TODO : should/can be changed by vci_param::B ?
 
 				~CcRamCore();  
 
@@ -179,9 +179,7 @@ namespace caba{
 
 				void transition();
 				void genMoore();
-#ifndef DEBUG_SRAM
-				void genMealy(); // no mealy when using the embeded s-ram for debug
-#endif
+				void genMealy(); 
 
 				// TODO : obsolete methods
 				unsigned int rw_seg(
