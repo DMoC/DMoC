@@ -236,7 +236,6 @@ bool SOCLIB_DIRECTORY::Is_Other(uint32_t x){
 			}
 		} else if (j == (((uint32_t)(x))>>5)) {
 			acc |= (dir_slice[j] & ~(0x1<<(x%32)));
-
 		} else { acc |= dir_slice[j];}
 	}
 	return (acc != 0);

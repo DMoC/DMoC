@@ -145,7 +145,12 @@ namespace caba {
 					{
 						DRAMCOUT(1) << name() << " [RAM_DATA_INVAL] " << endl;
 						unsigned int blocknum = (((r_SAV_ADDRESS.read() - m_vci_fsm.getBase(r_SAV_SEGNUM.read())) & m_BLOCKMASK) >> m_ADDR_BLOCK_SHIFT);
-						bool save_p = s_DIRECTORY[r_SAV_SEGNUM.read()][blocknum].Is_p(m_cct->translate_to_id(r_SAV_SCRID.read()));
+						bool save_p = false;
+						int node_id = m_cct->translate_to_id(r_SAV_SCRID.read());
+						if (node_id != -1)
+						{
+							save_p = s_DIRECTORY[r_SAV_SEGNUM.read()][blocknum].Is_p(m_cct->translate_to_id(r_SAV_SCRID.read()));
+						}
 
 						if((inv_fsm_state_e)r_INV_FSM.read() == RAM_INV_IDLE)
 						{ // We stay heere until the INV_FSM is not free. This will not generate a deadlock
@@ -154,12 +159,16 @@ namespace caba {
 
 							// Set the INV_BLOCKSTATE used to invalidate the OTHER copies of this block (disable source id flag).
 							r_INV_BLOCKSTATE = s_DIRECTORY[r_SAV_SEGNUM.read()][blocknum];
-							r_INV_BLOCKSTATE.Reset_p(m_cct->translate_to_id(r_SAV_SCRID.read()));
+							if (node_id != -1)
+							{
+								r_INV_BLOCKSTATE.Reset_p(m_cct->translate_to_id(r_SAV_SCRID.read()));
+							}
 							assert(!r_INV_BLOCKSTATE.Is_empty());
 
 							// Reset the Directory with the exception of source id flag, could be done with a XOR and a shifter	
 							s_DIRECTORY[r_SAV_SEGNUM.read()][blocknum].Reset_all();
-							if (save_p){
+							if (save_p)
+							{
 								s_DIRECTORY[r_SAV_SEGNUM.read()][blocknum].Set_p(m_cct->translate_to_id(r_SAV_SCRID.read())); 
 							}
 

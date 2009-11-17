@@ -86,11 +86,12 @@ namespace caba {
 		m_sram_ce = true;
 		m_sram_bk = seg;
 
-		if (node_id == -1) return true; // the initiator does not support coherence (ex. fd_access).
-		if (s_DIRECTORY[seg][blocknum].Is_Other(node_id) && eop )
+		if ((((node_id == -1) && !s_DIRECTORY[seg][blocknum].Is_empty())
+				|| ((node_id != -1) && s_DIRECTORY[seg][blocknum].Is_Other(node_id)))
+				&& eop)
+		{
 			// Send invalidation only if it is the last cell of the paquet
 			// in order to avoid deadlocks, report to TODO point for an explanation 
-		{ 
 			r_RAM_FSM = RAM_DATA_INVAL;
 			r_SAV_ADDRESS = m_vci_fsm.getBase(seg)+addr;
 			r_SAV_SEGNUM = seg;
