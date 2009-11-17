@@ -108,23 +108,23 @@ namespace caba{
 				sc_out<bool>   p_sram_ce;
 				sc_out<bool>   p_sram_oe;
 				sc_out<bool>   p_sram_we;
-				sc_out<typename sram_param::be_t>   p_sram_be;
-				sc_out<typename sram_param::addr_t>   p_sram_addr;
-				sc_out<typename sram_param::data_t>   p_sram_dout; // wdata
+				sc_out<typename sram_param::be_t>    p_sram_be;
+				sc_out<typename sram_param::addr_t>  p_sram_addr;
+				sc_out<typename sram_param::data_t>  p_sram_dout; // wdata
 				sc_in<typename sram_param::data_t>   p_sram_din;  // rdata
 				sc_in<bool>   p_sram_ack;  // rdata
 
 				// Migration related ports
 #ifndef NOCTRL
-				sc_in<bool>   p_ctrl_req;
+				sc_in<bool>   		p_ctrl_req;
 				sc_in<uint32_t>   p_ctrl_in_cmd;
 				sc_in<uint32_t>   p_ctrl_in_data_0;
 				sc_in<uint32_t>   p_ctrl_in_data_1;
-				sc_in<bool>  p_ctrl_rsp_ack; 
+				sc_in<bool>  			p_ctrl_rsp_ack; 
 
-				sc_out<bool>  p_ctrl_req_ack; 
-				sc_out<uint32_t>   p_ctrl_out_cmd;
-				sc_out<bool>  p_ctrl_rsp; 
+				sc_out<bool>  		p_ctrl_req_ack; 
+				sc_out<uint32_t>  p_ctrl_out_cmd;
+				sc_out<bool>  		p_ctrl_rsp; 
 				sc_out<uint32_t>  p_ctrl_out_data_0; 
 #endif
 

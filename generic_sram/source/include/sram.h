@@ -42,6 +42,7 @@
 
 #include "sram_param.h"
 #include <string>
+#include <list>
 
 
 namespace soclib{
