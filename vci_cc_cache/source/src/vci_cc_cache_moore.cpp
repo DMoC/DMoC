@@ -124,6 +124,7 @@ const unsigned int dec = r_REQ_DCACHE_ADDR_PHYS.read() & 0x3;
 			p_i_vci.cmdval = true;
 			p_i_vci.address = (r_REQ_DCACHE_ADDR_PHYS.read() & (~0x3));
 			p_i_vci.wdata   = r_REQ_DCACHE_DATA.read() << dec*8;
+			std::cout << " cache @ " << (r_REQ_DCACHE_ADDR_PHYS.read() & (~0x3)) << " data " << (r_REQ_DCACHE_DATA.read() << dec*8) << std::endl;
 			p_i_vci.be     = r_DCACHE_WF_BE_SAVE.read();
 			p_i_vci.plen = (vci_param::B * r_WRITE_BURST_SIZE.read()) - 
 										(vci_param::B - soclib::common::fls((uint32_t)r_DCACHE_WF_BE_SAVE.read())) -
