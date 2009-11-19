@@ -66,7 +66,9 @@ namespace caba{
 				typedef SramParam<4,32> sram_param ;
 
 				soclib::caba::SRam<sram_param> * c_sram_32; // 32bits Sram
+			public :
 				soclib::caba::CcRamCore<vci_param,sram_param> * c_core;
+			private :
 
 				soclib::common::Loader					m_loader;
 				soclib::common::MappingTable		m_MapTab;			

@@ -465,7 +465,7 @@ tmpl(void)::genMoore()
         break;
     }
 
-	p_vci.rspval = m_send_rsp;
+		p_vci.rspval = m_send_rsp;
     p_vci.rspSetIds( m_current_cmd.srcid, m_current_cmd.trdid, m_current_cmd.pktid );
     p_vci.reop = m_current_cmd.eop;
     p_vci.rdata = m_current_cmd.rdata;

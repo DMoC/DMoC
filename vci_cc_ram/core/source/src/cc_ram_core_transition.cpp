@@ -195,6 +195,5 @@ namespace caba {
 					break;
 
 			} // end switch r_RAM_FSM
-
 	}; 
 }}

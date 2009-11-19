@@ -63,7 +63,14 @@ namespace caba {
 
 
 		SC_METHOD (genMealy);
+		sensitive << p_bk_sel;
 		sensitive << p_ce;
+		sensitive << p_oe;
+		sensitive << p_we;
+		sensitive << p_be;
+		sensitive << p_addr;
+		sensitive << p_din;
+
 		dont_initialize();
 
 		// Array allocation, data allocated in build_bank(..)

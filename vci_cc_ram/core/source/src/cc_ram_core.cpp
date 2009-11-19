@@ -97,6 +97,8 @@ namespace caba {
 
 		SC_METHOD (genMealy);
 		sensitive << p_sram_ack;
+		sensitive << p_sram_din;
+		sensitive_neg << p_clk;
 		dont_initialize();
 
 		// Some checks
