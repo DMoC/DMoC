@@ -43,16 +43,25 @@ namespace caba {
 	/////////////////////////////////////////////////////
 	tmpl(void)::genMealy()
 	{
+		std::cout << "c_core m  ";
 		if (p_sram_ack.read()) // S-Ram sends a response (on a read)
 		{
 			// set "directly" the data field of the builded response packet in the target fsm
 			*m_fsm_data = p_sram_din.read();
+			std::cout << " setting  " << std::hex << p_sram_din.read() ;
 		}
 		if (r_RAM_FSM.read() == RAM_IDLE) // step a cycle on the target fsm (ie. send responses)
 		{
 				// This MUST be done after setting the data (*m_fsm_data=data) in order to write
 				// the correct value on the vci port.	
 				m_vci_fsm . genMoore();
+				std::cout << " m_vci_fsm.moore()  " << std::endl ;
+		}
+		else
+		{
+				p_t_vci.cmdack = false;
+				p_t_vci.rspval = false;
+			std::cout << " cmdack/rspval <- false " << std::endl ;
 		}
 	};
 }}

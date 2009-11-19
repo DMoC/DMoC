@@ -48,6 +48,7 @@ namespace caba {
 
 	tmpl(void)::transition()
 	{
+		std::cout << "c_core T" << std::endl;
 		m_nbcycles++;
 
 		if (!p_resetn.read()) // Reset_N signal
@@ -195,6 +196,5 @@ namespace caba {
 					break;
 
 			} // end switch r_RAM_FSM
-
 	}; 
 }}

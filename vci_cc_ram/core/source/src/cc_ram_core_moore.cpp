@@ -44,32 +44,6 @@ namespace caba {
 	/////////////////////////////////////////////////////
 	tmpl(void)::genMoore()
 	{
-
-// Setting Vci and Ctrl output signals
-
-		switch (r_RAM_FSM.read()) {
-
-			case RAM_IDLE :
-				break;
-
-#if 0
-			case RAM_REGISTERS_REQ :
-			case RAM_REGISTERS_END :
-#endif
-			case RAM_DATA_INVAL :
-			case RAM_DATA_INVAL_WAIT :
-			case RAM_DIRUPD :
-				p_t_vci.cmdack = false;
-				p_t_vci.rspval = false;
-				break;
-
-			default :
-				assert(false); // unknown state
-				break;
-
-		} // end switch r_RAM_FSM
-
-
 		switch (r_INV_FSM.read()) {
 
 			case RAM_INV_IDLE :
@@ -144,6 +118,8 @@ namespace caba {
 		p_sram_be   = m_sram_be;
 		p_sram_addr = m_sram_addr;
 		p_sram_dout =  m_sram_wdata;
+		std::cout << "c_core M : ce <- " << m_sram_ce << std::endl;
+
 		m_sram_ce = false; // CE set for one cycle only
 	}; // end genMoore()
 }}

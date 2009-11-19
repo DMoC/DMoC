@@ -30,10 +30,12 @@
 #include "vci_cc_cache.h"
 namespace soclib { 
 namespace caba {
+#define SC
 
 #define tmpl(x)  template<typename vci_param, typename iss_t> x VciCcCache<vci_param, iss_t>
 	tmpl(void)::printdcachelines(struct modelResource *d)
 	{
+#if 0
 #define W s_DCACHE_DATA[y_adr][li].read().read()
 #define Z(i) ((char)(W>>i)>=' '&&(char)(W>>i)<='~'?(char)(W>>i):'.')
 		unsigned int start      = d->start;
@@ -57,10 +59,12 @@ namespace caba {
 		}
 #undef W
 #undef Z
+#endif
 	}
 
 	tmpl(void)::printdcachedata(struct modelResource *d)
 	{
+#if 0
 #define W s_DCACHE_DATA[y_adr][x_adr].read().read()
 #define Z(i) ((char)(W>>i)>=' '&&(char)(W>>i)<='~'?(char)(W>>i):'.')
 		typename vci_param::addr_t x_adr, y_adr, z_adr;
@@ -78,11 +82,13 @@ namespace caba {
 		printf( "%c%c%c%c\n", Z(0), Z(8), Z(16), Z(24));
 #undef W
 #undef Z
+#endif
 	}
 
 
 	tmpl(void)::printicachelines(struct modelResource *d)
 	{
+#if 0
 #define W s_ICACHE_DATA[y_adr][li].read().read()
 #define Z(i) ((char)(W>>i)>=' '&&(char)(W>>i)<='~'?(char)(W>>i):'.')
 		unsigned int start      = d->start;
@@ -105,10 +111,12 @@ namespace caba {
 		}
 #undef W
 #undef Z
+#endif
 	}
 
 	tmpl(void)::printicachedata(struct modelResource *d)
 	{
+#if 0
 #define W s_ICACHE_DATA[y_adr][x_adr].read().read()
 #define Z(i) ((char)(W>>i)>=' '&&(char)(W>>i)<='~'?(char)(W>>i):'.')
 		unsigned int x_adr, y_adr, z_adr;
@@ -125,6 +133,7 @@ namespace caba {
 		printf( "%c%c%c%c\n", Z(0), Z(8), Z(16), Z(24));
 #undef W
 #undef Z
+#endif
 	}
 
 	tmpl(const char *)::GetModel()
@@ -249,7 +258,11 @@ namespace caba {
 				adr = strtoul(p[i],&misc ,0);
 				x_adr = m_d_x[adr];
 				y_adr = m_d_y[adr];
+#ifdef SC 
+				assert(false);
+#else
 				res->addr = (int*)(s_DCACHE_DATA[y_adr][x_adr].get_pointer()); //todo : is a valid cast?
+#endif
 				return 0;
 			}else
 				std::cerr << name() << " Error, expected: dcache <addr>" << std::endl;
@@ -259,7 +272,12 @@ namespace caba {
 				adr = strtoul(p[i],&misc ,0);
 				x_adr = m_d_x[adr];
 				y_adr = m_d_y[adr];
+#ifdef SC 
+				assert(false);
+#else
 				res->addr = (int*)(s_ICACHE_DATA[y_adr][x_adr].get_pointer()); //todo : is a valid cast?
+#endif
+
 				return 0;
 			}else
 				std::cerr << name() << " Error, expected: icache <addr>" << std::endl;

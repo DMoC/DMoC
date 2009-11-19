@@ -98,6 +98,8 @@ namespace caba {
 #ifndef DEBUG_SRAM
 		SC_METHOD (genMealy);
 		sensitive << p_sram_ack;
+		sensitive << p_sram_din;
+		sensitive_neg << p_clk;
 		dont_initialize();
 #endif
 

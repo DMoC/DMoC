@@ -113,6 +113,7 @@ namespace caba {
 		int node_id = m_cct->translate_to_id(m_vci_fsm.currentSourceId());
 		unsigned int source_id = m_vci_fsm.currentSourceId();
 		int blocknum = (addr  >> m_ADDR_BLOCK_SHIFT);
+	  std::cout << "c_core on_read() @ " << std::hex << addr << std::endl;
 
 
 		r_IN_TRANSACTION = !eop;
