@@ -99,7 +99,8 @@ namespace caba {
 
 			old_value = s_RAM[bank_sel][offset];
 			s_RAM[bank_sel][offset] = (s_RAM[bank_sel][offset] & ~mask) | (wdata & mask);
-			std::cout << "sram rw : W set " << std::hex << ((s_RAM[bank_sel][offset] & ~mask) | (wdata & mask)) << " old " << old_value <<  std::endl;
+			std::cout << "sram rw : W set " << std::hex << ((s_RAM[bank_sel][offset] & ~mask) | (wdata & mask)) << " old " << old_value;
+			std::cout << " mask " << std::hex << mask << " ~mask" << (~mask) << " wdata " << wdata << " be " << be << " (wdata & mask) " << (wdata & mask) << std::endl;
 #if 0
 			// This components returns the previous value of the modified data
 			return old_value;
