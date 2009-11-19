@@ -85,6 +85,7 @@ namespace caba {
 		assert(bank_sel < m_nb_banks);
 		if (oe)
 		{
+			std::cout << "sram rw : R " << std::hex << s_RAM[bank_sel][offset] <<  std::endl;
 			return(s_RAM[bank_sel][offset]);
 		}
 		else
@@ -98,6 +99,7 @@ namespace caba {
 
 			old_value = s_RAM[bank_sel][offset];
 			s_RAM[bank_sel][offset] = (s_RAM[bank_sel][offset] & ~mask) | (wdata & mask);
+			std::cout << "sram rw : W set " << std::hex << ((s_RAM[bank_sel][offset] & ~mask) | (wdata & mask)) << " old " << old_value <<  std::endl;
 #if 0
 			// This components returns the previous value of the modified data
 			return old_value;

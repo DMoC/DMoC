@@ -119,6 +119,7 @@ namespace caba {
 		p_sram_addr = m_sram_addr;
 		p_sram_dout =  m_sram_wdata;
 
+		std::cout << "c_core M ce " << m_sram_ce <<  std::endl;
 		m_sram_ce = false; // CE set for one cycle only
 	}; // end genMoore()
 }}

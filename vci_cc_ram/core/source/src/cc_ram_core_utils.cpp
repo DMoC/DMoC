@@ -107,6 +107,7 @@ namespace caba {
 	/***********************************************************************************************/
 	tmpl(bool)::on_read(size_t seg, typename vci_param::addr_t addr, typename vci_param::data_t &data, bool eop)
 	{
+		std::cout << " on_read @ " << std::hex << addr << std::endl;
 		// node_id : in [0 - nb_coherent_initiators_on_the_platform[, if node_id == -1 the
 		//           initiator was a processor (cache), or a coherent initiator (??) 
 		// source_id : srcid field of the request, with a N-level NoC it could be anything
