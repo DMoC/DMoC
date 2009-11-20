@@ -77,7 +77,7 @@ tmpl(void)::transition()
 	std::cout << name() << " C : " << ncycles;
 	std::cout << " I [ R->" << icache_req << " @->" << std::hex << icache_address << " hit->" << icache_hit << " ]";
 	std::cout << " D [ R->" << dcache_req << " @->" << std::hex << dcache_address << " hit->" << dcache_hit;
-  std::cout << " be->" << dcache_be << " type->" << dcache_type << " wdata->" << dcache_wdata << " ]" << std::endl;
+  std::cout << " be->" << (unsigned int)(dcache_be) << " type->" << dcache_type << " wdata->" << dcache_wdata << " ]" << std::endl;
            
 	ncycles++;
 
