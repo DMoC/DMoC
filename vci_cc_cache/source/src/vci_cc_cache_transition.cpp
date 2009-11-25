@@ -282,7 +282,7 @@ tmpl(void)::transition()
 					{
 						if (((dcache_address & m_dcache_zmask) == r_DCACHE_ENQUEUED_ADDR_SAVE.read()) // Address of a byte in the same address word
 								&& (dcache_type == iss_t::DATA_WRITE )
-								&& (ffs(dcache_be) == (soclib::common::fls(r_DCACHE_WL_BE_SAVE.read()) + 1))) // consecutive be's  
+								&& (ffs((uint32_t)dcache_be) == (soclib::common::fls((uint32_t)r_DCACHE_WL_BE_SAVE.read()) + 1))) // consecutive be's  
 							// merge the next data in the same cell
 						{
 							// update DATA_FIFO_INPUT and current be (DCACHE_WL_BE_SAVE)
