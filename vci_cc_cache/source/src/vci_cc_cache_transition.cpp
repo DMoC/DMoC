@@ -497,7 +497,9 @@ tmpl(void)::transition()
 		uint32_t it = 0;
 		for (size_t i=0; i<(size_t)iss_t::n_irq; i++)
 		{
-			if(p_irq[i].read()) { it |= (1<<i); }
+			if(p_irq[i].read()) {
+					 it |= (1<<i);
+			}
 		}
 		m_iss.executeNCycles(1, icache_rsp_port, dcache_rsp_port, it);
 	}
@@ -800,7 +802,7 @@ tmpl(void)::transition()
 						std::cout << " 		eop      : 0x" << std::hex << (int)p_t_vci.eop.read() << std::endl;
 						std::cout << " 		srcid    : " << std::hex << (int)p_t_vci.srcid.read() << std::endl;
 						std::cout << " 		ncycles  : " << std::hex <<  ncycles << std::endl;
-						raise(SIGINT);
+						sc_stop();
 						return;
 					}
 					assert(dr_inv_command == vci_param::CMD_WRITE);    // invalidations are coded as write commands
