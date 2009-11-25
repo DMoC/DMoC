@@ -31,6 +31,7 @@
 ///////////////////////////////////////
 #include "vci_cc_cache.h"
 
+#include <iomanip>
 namespace soclib { 
 namespace caba {
 #define tmpl(x)  template<typename vci_param, typename iss_t> x VciCcCache<vci_param, iss_t>
@@ -74,11 +75,18 @@ tmpl(void)::transition()
 	bool		write_buffer_put = false;
 	bool		write_buffer_get = false;
 
-	std::cout << name() << " C : " << ncycles;
-	std::cout << " I [ R->" << icache_req << " @->" << std::hex << icache_address << " hit->" << icache_hit << " ]";
-	std::cout << " D [ R->" << dcache_req << " @->" << std::hex << dcache_address << " hit->" << dcache_hit;
-  std::cout << " be->" << (unsigned int)(dcache_be) << " type->" << dcache_type << " wdata->" << dcache_wdata << " ]" << std::endl;
+#if 0
+	std::cout << name() <<  std::setfill('0') << " C : " << ncycles;
+	std::cout << " I [ R->" << icache_req << " @->" << std::hex << std::setw(8) << icache_address << " hit->" << icache_hit << " ]";
+	std::cout << " D [ R->" << dcache_req << " @->" << std::hex << std::setw(8) << dcache_address << " hit->" << dcache_hit;
+  std::cout << std::hex <<" be->" << std::setw(1) << (unsigned int)(dcache_be) << " type->" << std::setw(1) << dcache_type << " wdata->" << std::setw(8) << dcache_wdata << " ]" << std::endl;
            
+#else
+printf("%s : C : %lld",name().c_str(), ncycles);
+printf(" I [ R->%d  @->0x%x hit->%d", icache_req, (unsigned int)icache_address, icache_hit);
+printf(" D [ R->%d  @->0x%x hit->%d", dcache_req, (unsigned int)dcache_address, dcache_hit);
+printf(" be->0x%x type->0x%x wdata->0x%x  WB_filled %d\n",(unsigned int)(dcache_be),(unsigned int)dcache_type,(unsigned int)dcache_wdata, m_WRITE_BUFFER_DATA.filled_status());
+#endif
 	ncycles++;
 
 	//////////////////////////////
@@ -147,7 +155,11 @@ tmpl(void)::transition()
 			{
 				icache_rsp_port.valid          = icache_hit;
 				icache_rsp_port.instruction    = s_ICACHE_DATA[icache_y][icache_x].read();
-				std::cout << name() << " IDLE set_rsp [ v<- " << icache_hit << " i<-" << s_ICACHE_DATA[icache_y][icache_x].read() << " ] " << std::endl;
+#if 0
+				std::cout << name() << " IDLE set_rsp [ v<- " << icache_hit << " i<-" << std::setw(8) << s_ICACHE_DATA[icache_y][icache_x].read() << " ] " << std::endl;
+#else
+				printf("%s IDLE set_rsp [ v<-%d i<-0x%x ]\n",name().c_str(),icache_hit, (unsigned int)s_ICACHE_DATA[icache_y][icache_x].read());
+#endif
 			}
 			else // miss, issue a miss request and wait for the response
 			{
@@ -269,7 +281,12 @@ tmpl(void)::transition()
 							r_DCACHE_WL_BE_SAVE = dcache_be; 
 							r_DATA_FIFO_INPUT = dcache_wdata; 
 							r_ADDR_FIFO_INPUT = dcache_address & m_dcache_zmask; 
+#if 0
 							std::cout << name() << " WB set_rsp [ v<- " << (true) << " r<-" << 0 << " ] " << std::endl;
+#else
+							printf("%s Buffer_filled_status %d",name().c_str(), m_WRITE_BUFFER_DATA.filled_status());
+							printf(" t0 WB set_rsp [ v<-1 r<-0 ]\n");
+#endif
 							dcache_rsp_port.valid = true;
 							dcache_rsp_port.rdata = 0;
 							if (dcache_hit) // On hit, going update the line
@@ -289,7 +306,7 @@ tmpl(void)::transition()
 					{
 						if (((dcache_address & m_dcache_zmask) == r_DCACHE_ENQUEUED_ADDR_SAVE.read()) // Address of a byte in the same address word
 								&& (dcache_type == iss_t::DATA_WRITE )
-								&& (ffs(dcache_be) == (soclib::common::fls(r_DCACHE_WL_BE_SAVE.read()) + 1))) // consecutive be's  
+								&& (ffs((uint32_t)dcache_be) == (soclib::common::fls((uint32_t)r_DCACHE_WL_BE_SAVE.read()) + 1))) // consecutive be's  
 							// merge the next data in the same cell
 						{
 							// update DATA_FIFO_INPUT and current be (DCACHE_WL_BE_SAVE)
@@ -297,7 +314,12 @@ tmpl(void)::transition()
 							r_DATA_FIFO_INPUT = (r_DATA_FIFO_INPUT.read() & ~(mask)) | (dcache_wdata & mask);
 							dcache_rsp_port.valid = true;
 							dcache_rsp_port.rdata = 0;
+#if 0
 							std::cout << name() << " WB set_rsp [ v<- " << (true) << " r<-" << 0 << " ] " << std::endl;
+#else
+							printf("%s Buffer_filled_status %d",name().c_str(), m_WRITE_BUFFER_DATA.filled_status());
+							printf(" t1 WB set_rsp [ v<-1 r<-0 ]\n");
+#endif
 							if (r_DCACHE_FIRST_CELL.read())
 								// for first cell of a burst, update the WF_BE in order to compute a correct plen.
 							{
@@ -340,7 +362,11 @@ tmpl(void)::transition()
 									r_DCACHE_FSM = DCACHE_IDLE;
 									dcache_rsp_port.valid = true;
 									dcache_rsp_port.rdata = s_DCACHE_DATA[dcache_y][dcache_x].read();
-									std::cout << name() << " READ set_rsp [ v<- " << (true) << " r<-" << s_DCACHE_DATA[dcache_y][dcache_x].read() << " ] " << std::endl;
+#if 0
+									std::cout << name() << " READ set_rsp [ v<- " << (true) << " r<-" << std::setw(8) << s_DCACHE_DATA[dcache_y][dcache_x].read() << " ] " << std::endl;
+#else
+									printf("%s READ set_rsp [ v<-1 r<-0x%x ]\n",name().c_str(),(unsigned int)s_DCACHE_DATA[dcache_y][dcache_x].read());
+#endif
 								}
 							}
 							else // Issue an unached request to memory
@@ -379,7 +405,11 @@ tmpl(void)::transition()
 							r_DCACHE_FIRST_CELL = true;
 							dcache_rsp_port.valid = true;
 							dcache_rsp_port.rdata = 0;
+#if 0
 							std::cout << name() << " DATA_W set_rsp [ v<- " << (true) << " r<-" << 0 << " ] " << std::endl;
+#else
+							printf("%s DATA_W set_rsp [ v<-1 r<-0 ]\n",name().c_str());
+#endif
 							break;
 
 						case iss_t::XTN_READ :
@@ -389,7 +419,11 @@ tmpl(void)::transition()
 								case iss_t::XTN_SYNC : // Cache Sync (flush) request, being here guaranties that the write-buffer is empty :-)
 									dcache_rsp_port.valid = true;
 									dcache_rsp_port.rdata = 0;
+#if 0
 									std::cout << name() << " XTN set_rsp [ v<- " << (true) << " r<-" << 0 << " ] " << std::endl;
+#else
+							printf("%s XTN set_rsp [ v<-1 r<-0 ]\n",name().c_str());
+#endif
 									break;
 								default : 
 									assert(false);
@@ -450,7 +484,11 @@ tmpl(void)::transition()
 				}
 				dcache_rsp_port.valid = true;
 				dcache_rsp_port.rdata = r_RSP_DCACHE_MISS_BUF[x].read();
-				std::cout << name() << " MISSUPT set_rsp [ v<- " << (true) << " r<-" << r_RSP_DCACHE_MISS_BUF[x].read() << " ] " << std::endl;
+#if 0
+				std::cout << name() << " MISSUPT set_rsp [ v<- " << (true) << " r<-" << std::setw(8) << r_RSP_DCACHE_MISS_BUF[x].read() << " ] " << std::endl;
+#else
+							printf("%s MISSUPT set_rsp [ v<-1 r<-0x%x ]\n",name().c_str(),(unsigned int)r_RSP_DCACHE_MISS_BUF[x].read());
+#endif
 				r_DCACHE_FSM = DCACHE_IDLE;
 				break;
 			}
@@ -473,7 +511,11 @@ tmpl(void)::transition()
 
 				dcache_rsp_port.valid = true;
 				dcache_rsp_port.rdata = r_RSP_DCACHE_UNC_BUF.read();
-				std::cout << name() << " GO set_rsp [ v<- " << (true) << " r<-" << r_RSP_DCACHE_UNC_BUF.read() << " ] " << std::endl;
+#if 0
+				std::cout << name() << " GO set_rsp [ v<- " << (true) << " r<-" << std::setw(8) << r_RSP_DCACHE_UNC_BUF.read() << " ] " << std::endl;
+#else
+							printf("%s GO set_rsp [ v<-1 r<-0x%x ]\n",name().c_str(),(unsigned int)r_RSP_DCACHE_UNC_BUF.read());
+#endif
 				r_DCACHE_FSM = DCACHE_IDLE;
 
 				break;
@@ -707,7 +749,11 @@ tmpl(void)::transition()
 				r_RSP_CPT = r_RSP_CPT + 1; 
 				r_RSP_ICACHE_MISS_BUF[r_RSP_CPT] = p_i_vci.rdata.read(); 
 
-				std::cout << name() << " IMISS [ d<- " << p_i_vci.rdata.read() << " e<-" << p_i_vci.rerror.read() << " ] " << std::endl; 
+#if 0
+				std::cout << name() << " IMISS [ d<- " << std::setw(8) << p_i_vci.rdata.read() << " e<-" << std::setw(1) << p_i_vci.rerror.read() << " ] " << std::endl; 
+#else
+							printf("%s IMISS [ d<-0x%x e<-%d ]\n",name().c_str(),(unsigned int)p_i_vci.rdata.read(),(unsigned int)p_i_vci.rerror.read());
+#endif
 
 				if ( (r_RSP_CPT == s_icache_words -1) && (p_i_vci.rerror.read() == vci_param::ERR_NORMAL) && !r_IRETRY_REQ.read())
 				// No error, all responses received, send IRSP_OK signal to unlock the DCACHE_FSM
@@ -730,7 +776,11 @@ tmpl(void)::transition()
 		case RSP_DMISS :
 			if (p_i_vci.rspval.read())
 			{
-				std::cout << name() << " DMISS [ d<- " << p_i_vci.rdata.read() << " e<-" << p_i_vci.rerror.read() << " ] " << std::endl; 
+#if 0
+				std::cout << name() << " DMISS [ d<- " << std::setw(8) << p_i_vci.rdata.read() << " e<-"<< std::setw(1)  << p_i_vci.rerror.read() << " ] " << std::endl; 
+#else
+							printf("%s DMISS [ d<-0x%x e<-%d ]\n",name().c_str(),(unsigned int)p_i_vci.rdata.read(),(unsigned int)p_i_vci.rerror.read());
+#endif
 				assert(!(r_RSP_CPT == s_dcache_words));  //illegal VCI response packet for data read miss
 				r_RSP_CPT = r_RSP_CPT + 1; 
 				r_RSP_DCACHE_MISS_BUF[r_RSP_CPT] = p_i_vci.rdata.read(); 
@@ -750,7 +800,11 @@ tmpl(void)::transition()
 		case RSP_WRITE :
 			if (p_i_vci.rspval.read())
 			{ 
-				std::cout << name() << " WRITE [ d<- " << p_i_vci.rdata.read() << " e<-" << p_i_vci.rerror.read() << " ] " << std::endl; 
+#if 0
+				std::cout << name() << " WRITE [ d<- " << std::setw(8) << p_i_vci.rdata.read() << " e<-"<< std::setw(1)  << p_i_vci.rerror.read() << " ] " << std::endl; 
+#else
+							printf("%s WRITE [ d<-0x%x e<-%d ]\n",name().c_str(),(unsigned int)p_i_vci.rdata.read(),(unsigned int)p_i_vci.rerror.read());
+#endif
 				assert(p_i_vci.reop.read());    // illegal VCI response paquet for write 
 				if (p_i_vci.rerror.read() == vci_param::ERR_NORMAL)
 				{
@@ -772,7 +826,11 @@ tmpl(void)::transition()
 		case RSP_UNC : 
 			if (p_i_vci.rspval.read())
 			{ 
-				std::cout << name() << " UNC [ d<- " << p_i_vci.rdata.read() << " e<-" << p_i_vci.rerror.read() << " ] " << std::endl; 
+#if 0
+				std::cout << name() << " UNC [ d<- " << std::setw(8) << p_i_vci.rdata.read() << " e<-"<< std::setw(1)  << p_i_vci.rerror.read() << " ] " << std::endl; 
+#else
+							printf("%s UNC [ d<-0x%x e<-%d ]\n",name().c_str(),(unsigned int)p_i_vci.rdata.read(),(unsigned int)p_i_vci.rerror.read());
+#endif
 				r_RSP_DCACHE_UNC_BUF = p_i_vci.rdata.read(); 
 				assert(p_i_vci.reop.read());    // illegal VCI response paquet for data read uncached
 				if (p_i_vci.rerror.read() == vci_param::ERR_NORMAL)
@@ -810,8 +868,13 @@ tmpl(void)::transition()
 
 				if (p_t_vci.cmdval.read())
 				{ 
-					std::cout << name() << " INV [ d<- " << p_t_vci.wdata.read() << " a<-" << p_t_vci.address.read();
-					std::cout << " s/p/t<-" << p_t_vci.srcid.read() << "/" << p_t_vci.pktid.read() << "/" << p_t_vci.trdid.read() << " ] " << std::endl; 
+#if 0
+					std::cout << name() << " INV [ d<- " << std::setw(8) << p_t_vci.wdata.read() << " a<-" << std::setw(8) << p_t_vci.address.read();
+					std::cout << " s/p/t<-" << std::setw(8) << p_t_vci.srcid.read() << "/" << std::setw(8) << p_t_vci.pktid.read() << "/" << std::setw(8) << p_t_vci.trdid.read() << " ] " << std::endl; 
+#else
+							printf("%s INV [ d<-0x%x a<-%d ",name().c_str(),(unsigned int)p_t_vci.wdata.read(),(unsigned int)p_t_vci.address.read());
+							printf("s/p/t<- 0x%x 0x%x 0x%x",(unsigned int)p_t_vci.srcid.read(),(unsigned int)p_t_vci.pktid.read(), (unsigned int)p_t_vci.trdid.read());
+#endif
 					if (!m_segment -> contains(dr_inv_address)){
 						std::cout << "> SoCLib segmentation fault" << std::endl; 
 						std::cout << "> A request has been sent by a component to a non-mapped address, it was cached by the target :" << name() << std::endl;
