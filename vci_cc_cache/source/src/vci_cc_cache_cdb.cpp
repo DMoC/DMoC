@@ -28,6 +28,7 @@
 
 #ifdef CDB_COMPONENT_IF_H
 #include "vci_cc_cache.h"
+#include <iomanip>
 namespace soclib { 
 namespace caba {
 #define SC
@@ -88,9 +89,6 @@ namespace caba {
 
 	tmpl(void)::printicachelines(struct modelResource *d)
 	{
-#if 0
-#define W s_ICACHE_DATA[y_adr][li].read().read()
-#define Z(i) ((char)(W>>i)>=' '&&(char)(W>>i)<='~'?(char)(W>>i):'.')
 		unsigned int start      = d->start;
 		unsigned int len        = d->len;
 
@@ -100,40 +98,27 @@ namespace caba {
 		if (start + len > s_icache_lines) len = s_icache_lines - start;
 
 		// Display each line in start -> start + len.
-		puts("\n");
-		for (unsigned int y_adr =  start ; y_adr < start + len; y_adr++) {
-			printf( "%d ",y_adr);
+		std::cout << std::endl;
+		for (unsigned int y_adr =  start ; y_adr < start + len; y_adr++)
+		{
+			std::cout << " l-" << std::dec << y_adr << " ";
 			for (unsigned int li = 0; li < s_icache_words; li++)
-				printf( "%08x ", (unsigned int)(W));
-			for (unsigned int li = 0; li < s_icache_words; li++)
-				printf( " %c%c%c%c", Z(0), Z(8), Z(16), Z(24));
-			puts("\n");
+				std::cout << std::hex << std::setfill('0') <<  std::setw(10) << s_ICACHE_DATA[y_adr][li].read() << " ";
+			std::cout << " TAG "  << std::hex << std::setfill('0') <<  std::setw(10) << s_ICACHE_TAG[y_adr].read() << std::endl;
 		}
-#undef W
-#undef Z
-#endif
 	}
 
 	tmpl(void)::printicachedata(struct modelResource *d)
 	{
-#if 0
-#define W s_ICACHE_DATA[y_adr][x_adr].read().read()
-#define Z(i) ((char)(W>>i)>=' '&&(char)(W>>i)<='~'?(char)(W>>i):'.')
 		unsigned int x_adr, y_adr, z_adr;
 		unsigned int address     = d->start;
 
-
-		std::cout << "icache data" << std::endl;
 		x_adr = m_i_x[address];
 		y_adr = m_i_y[address];
 		z_adr = m_i_z[address];
-
-		printf( "%08x line:%d ", address, y_adr );
-		printf( "%08x ", (unsigned int)(W));
-		printf( "%c%c%c%c\n", Z(0), Z(8), Z(16), Z(24));
-#undef W
-#undef Z
-#endif
+		std::cout << " addr " << std::hex << std::setw(10) << address <<  " l-" << std::dec << y_adr << " " << " cached tag ";
+		std::cout << std::hex << std::setfill('0') <<  std::setw(10) << (s_ICACHE_TAG[y_adr].read() );
+		std::cout << " " <<  std::setfill('0') << std::setw(10) << s_ICACHE_DATA[y_adr][x_adr].read() << std::endl;
 	}
 
 	tmpl(const char *)::GetModel()

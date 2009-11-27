@@ -140,8 +140,14 @@ tmpl(void)::transition()
 											// this is the case beacause m_iss.executeNCycles is called AFTER 
 											// setting the values hereafter (.valid, and .instruction).
 			{
+				assert(icache_req);
 				icache_rsp_port.valid          = icache_hit;
 				icache_rsp_port.instruction    = s_ICACHE_DATA[icache_y][icache_x].read();
+				if ((s_ICACHE_DATA[icache_y][icache_x].read() == 0xFEED0BAD))
+				{
+					std::cout << name() << "WARNING : processor reads an instruction  that it was probably not initialized," << std::endl;
+					std::cout << name() << "          it contained the magic 0xFEED0BAD set at allocation time of S-ram memory." << std::endl;
+				}
 			}
 			else // miss, issue a miss request and wait for the response
 			{
@@ -332,6 +338,11 @@ tmpl(void)::transition()
 									r_DCACHE_FSM = DCACHE_IDLE;
 									dcache_rsp_port.valid = true;
 									dcache_rsp_port.rdata = s_DCACHE_DATA[dcache_y][dcache_x].read();
+									if((s_DCACHE_DATA[dcache_y][dcache_x].read() == 0xFEED0BAD))
+									{
+											std::cout << name() << "WARNING : processor reads a data that it was probably not initialized," << std::endl;
+											std::cout << name() << "          it contained the magic 0xFEED0BAD set at allocation time of S-ram memory." << std::endl;
+									}
 								}
 							}
 							else // Issue an unached request to memory
@@ -439,6 +450,11 @@ tmpl(void)::transition()
 				}
 				dcache_rsp_port.valid = true;
 				dcache_rsp_port.rdata = r_RSP_DCACHE_MISS_BUF[x].read();
+				if((r_RSP_DCACHE_MISS_BUF[x].read() != 0xFEED0BAD))
+				{
+					std::cout << name() << "WARNING : processor reads a data that it was probably not initialized," << std::endl;
+					std::cout << name() << "          it contained the magic 0xFEED0BAD set at allocation time of S-ram memory." << std::endl;
+				}
 				r_DCACHE_FSM = DCACHE_IDLE;
 				break;
 			}
@@ -461,6 +477,11 @@ tmpl(void)::transition()
 
 				dcache_rsp_port.valid = true;
 				dcache_rsp_port.rdata = r_RSP_DCACHE_UNC_BUF.read();
+				if ((r_RSP_DCACHE_UNC_BUF.read() == 0xFEED0BAD))
+				{
+					std::cout << name() << "WARNING : processor reads a data (unc, ll or sc)  that it was probably not initialized," << std::endl;
+					std::cout << name() << "          it contained the magic 0xFEED0BAD set at allocation time of S-ram memory." << std::endl;
+				}
 				r_DCACHE_FSM = DCACHE_IDLE;
 
 				break;

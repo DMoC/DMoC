@@ -65,6 +65,13 @@ namespace caba {
 
 
 		DRAMCOUT(0) << name() << " [RAM_WRITE] " << endl;
+#if 0
+		std::cout << "ram_utils, write :" << " seg " << std::dec << seg; 
+		std::cout << " addr " << std::hex << addr; 
+		std::cout << " be " << std::hex << be; 
+		std::cout << " eop " << std::hex << eop; 
+		std::cout << " wdata  " << std::hex << data << std::endl; 
+#endif
 
 		r_IN_TRANSACTION = !eop;
 
