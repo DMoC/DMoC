@@ -450,7 +450,7 @@ tmpl(void)::transition()
 				}
 				dcache_rsp_port.valid = true;
 				dcache_rsp_port.rdata = r_RSP_DCACHE_MISS_BUF[x].read();
-				if((r_RSP_DCACHE_MISS_BUF[x].read() != 0xFEED0BAD))
+				if((r_RSP_DCACHE_MISS_BUF[x].read() == 0xFEED0BAD))
 				{
 					std::cout << name() << "WARNING : processor reads a data that it was probably not initialized," << std::endl;
 					std::cout << name() << "          it contained the magic 0xFEED0BAD set at allocation time of S-ram memory." << std::endl;
@@ -522,7 +522,10 @@ tmpl(void)::transition()
 					 it |= (1<<i);
 			}
 		}
-		m_iss.executeNCycles(1, icache_rsp_port, dcache_rsp_port, it);
+		if ((icache_req && icache_hit) || (dcache_req && dcache_hit))
+			m_iss.executeNCycles(1, icache_rsp_port, dcache_rsp_port, it);
+		else
+			m_iss.executeNCycles(0, icache_rsp_port, dcache_rsp_port, it);
 	}
 
 	switch ((req_fsm_state_e)r_VCI_REQ_FSM.read())
