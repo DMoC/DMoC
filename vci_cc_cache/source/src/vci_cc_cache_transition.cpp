@@ -522,10 +522,7 @@ tmpl(void)::transition()
 					 it |= (1<<i);
 			}
 		}
-		if ((icache_req && icache_hit) || (dcache_req && dcache_hit))
 			m_iss.executeNCycles(1, icache_rsp_port, dcache_rsp_port, it);
-		else
-			m_iss.executeNCycles(0, icache_rsp_port, dcache_rsp_port, it);
 	}
 
 	switch ((req_fsm_state_e)r_VCI_REQ_FSM.read())
