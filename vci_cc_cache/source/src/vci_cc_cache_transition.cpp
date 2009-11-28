@@ -501,6 +501,17 @@ tmpl(void)::transition()
 					 it |= (1<<i);
 			}
 		}
+
+#if 0
+    std::cout << name () << "[===== " << ncycles << " ====]" << std::endl;
+
+    std::cout << name () << icache_req_port << std::endl;
+    std::cout << name () << icache_rsp_port << std::endl;
+
+    std::cout << name () << dcache_req_port << std::endl;
+    std::cout << name () << dcache_rsp_port << std::endl;
+#endif
+
 		m_iss.executeNCycles(1, icache_rsp_port, dcache_rsp_port, it);
 	}
 
