@@ -36,6 +36,24 @@ namespace caba {
 #define tmpl(x)  template<typename vci_param, typename iss_t> x VciCcCache<vci_param, iss_t>
 	tmpl(void)::printdcachelines(struct modelResource *d)
 	{
+		unsigned int start      = d->start;
+		unsigned int len        = d->len;
+
+		// Test on start and len parameters, adjust them if necessary to avoid out-of-bound accesses.
+
+		if (start > s_icache_lines) start = 0;
+		if (start + len > s_icache_lines) len = s_icache_lines - start;
+
+		// Display each line in start -> start + len.
+		std::cout << std::endl;
+		for (unsigned int y_adr =  start ; y_adr < start + len; y_adr++)
+		{
+			std::cout << " l-" << std::dec << y_adr << " ";
+			for (unsigned int li = 0; li < s_icache_words; li++)
+				std::cout << std::hex << std::setfill('0') <<  std::setw(10) << s_DCACHE_DATA[y_adr][li].read() << " ";
+			std::cout << " TAG "  << std::hex << std::setfill('0') <<  std::setw(10) << s_DCACHE_TAG[y_adr].read() << std::endl;
+		}
+
 #if 0
 #define W s_DCACHE_DATA[y_adr][li].read().read()
 #define Z(i) ((char)(W>>i)>=' '&&(char)(W>>i)<='~'?(char)(W>>i):'.')
@@ -65,6 +83,16 @@ namespace caba {
 
 	tmpl(void)::printdcachedata(struct modelResource *d)
 	{
+		unsigned int x_adr, y_adr, z_adr;
+		unsigned int address     = d->start;
+
+		x_adr = m_i_x[address];
+		y_adr = m_i_y[address];
+		z_adr = m_i_z[address];
+		std::cout << " addr " << std::hex << std::setw(10) << address <<  " l-" << std::dec << y_adr << " " << " cached tag ";
+		std::cout << std::hex << std::setfill('0') <<  std::setw(10) << (s_DCACHE_TAG[y_adr].read() );
+		std::cout << " " <<  std::setfill('0') << std::setw(10) << s_DCACHE_DATA[y_adr][x_adr].read() << std::endl;
+
 #if 0
 #define W s_DCACHE_DATA[y_adr][x_adr].read().read()
 #define Z(i) ((char)(W>>i)>=' '&&(char)(W>>i)<='~'?(char)(W>>i):'.')
