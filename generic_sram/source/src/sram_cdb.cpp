@@ -40,70 +40,62 @@ namespace caba {
 #define tmpl(x) template<typename sram_param> x SRam<sram_param>
 tmpl(void)::printramlines(struct modelResource *d)
 {
-#if 0
-        #define Z(i) ((char)(tab[line*m_BLOCK_SIZE + li]>>i)>=' '&&(char)(tab[line*m_BLOCK_SIZE + li]>>i)<='~'?(char)(tab[line*m_BLOCK_SIZE + li]>>i):'.')
-        unsigned int line;
-        unsigned int li;
+#if 1
 				unsigned int start      = d->start;
         unsigned int len        = d->len;
         unsigned int segnum = d->usr2;
-        unsigned int *tab;
-        unsigned int nb_max_lines;
         
-        tab = r_RAM;
-        // Test on start and len parameters, adjust them if necessary to avoid out-of-bound accesses.
-        nb_max_lines = ((m_segment.Size() >> 2)/m_BLOCK_SIZE);
-        if (start > nb_max_lines) start = 0;
-        if (start + len > nb_max_lines) len = nb_max_lines - start;
-        
-        // Display each line in start -> start + len.
-        putc('\n',stdout); //todo
-		assert(segnum == 0);
-        for (line =  start ; line < start + len; line++) {
-                printf( "0x%08x TAG=(",(((line*m_BLOCK_SIZE) << 2) + m_segment.baseAddress()));
-                (r_DIRECTORY[segnum][line]).Print();
-                printf(" %08x" ,((r_DIRECTORY[segnum][line]).Get_slice(0)));
-                printf(") %c ", ((!(r_DIRECTORY[segnum][line]).Is_empty()) ? 'S' : '-'));
-                for (li = 0; li < m_BLOCK_SIZE; li++)
-                        printf("%08x ", tab[line*m_BLOCK_SIZE + li]);
-                for (li = 0; li < m_BLOCK_SIZE; li++)
-                        printf( " %c%c%c%c", Z(0), Z(8), Z(16), Z(24));
-                puts("\n");
-        }
-#undef Z
+				// get the correct memory bank!
+				std::list<soclib::common::Segment>::iterator     iter = m_segment_list -> begin();
+				for (unsigned int i = 0; i < segnum ; i++)
+				{
+					iter++; 
+				}
+				assert(iter != m_segment_list->end());
+
+				for (unsigned int i = 0; i < len ; i ++)
+				{
+						std :: cout << std::hex << ( iter->baseAddress() + ((((start + i)*8)) << m_ADDR_WORD_SHIFT)) << " : " ;
+						for (unsigned int j = 0 ; j < 8 ; j++)
+							{
+									std::cout << (uint32_t) read_write_sram(segnum, ((start + i) * 8 + j), 0, false , true, 0) << " ";
+							}
+							std::cout << std::endl;
+				} 
+
+				
 #endif
 }
+
 tmpl(const char*)::GetModel()
 {
-    return("Write-through Write-invalidate Multisegment S-RAM memory");
+    return("Generic S-ram");
 }
 //
 tmpl(void)::printramdata(struct modelResource *d)
 {
-#if  0
-        #define W r_RAM[word]
-        #define Z(i) ((char)(W>>i)>=' '&&(char)(W>>i)<='~'?(char)(W>>i):'.')
-        unsigned int address  = d->start;
-        unsigned int segnum = d->usr2;
-        unsigned int word;
-        
-        
-        if ((address < m_segment.baseAddress()) || (address > (m_segment.baseAddress() + m_segment.size()))){
-                word = 0;
-                printf("address out of range");
-        } else word = (((address & ~m_LSBMASK) - m_segment.baseAddress()) >> 2);
+	typename sram_param::addr_t addr   = d->start;
+	typename sram_param::addr_t offset;
+	unsigned int segnum = d->usr2;
 
+	// get the correct memory bank!
+	std::list<soclib::common::Segment>::iterator     iter = m_segment_list -> begin();
+	for (unsigned int i = 0; i < segnum ; i++)
+	{
+		iter++; 
+	}
+	assert(iter != m_segment_list->end());
+	offset = (addr - iter -> baseAddress()) >> m_ADDR_WORD_SHIFT;
+	
 
-        printf("line:%d %08x ",word/m_BLOCK_SIZE ,W);
-        printf("%c%c%c%c\n", Z(0), Z(8), Z(16), Z(24));
-        #undef W
-        #undef Z
-#endif
+	std :: cout << std::dec << " line : "<< (offset / 8) << std::hex << " addr : " <<  addr << " : " ;
+	std::cout << (uint32_t) read_write_sram(segnum, offset, 0, false , true, 0) << " ";
+	std::cout << std::endl;
 }
 
 tmpl(int)::PrintResource(modelResource *res,char **p)
 {
-#if 0
+#if 1
 	std::list<soclib::common::Segment>::iterator     iter;
 	int i = 1;
 	int index = -1;
@@ -125,12 +117,12 @@ tmpl(int)::PrintResource(modelResource *res,char **p)
 				return 0;
 				break;
 			default:
-				std::cerr << "CACHE: No such ressource" << std::endl; //todo, CACHE should be name
+				std::cerr << "ram : No such ressource" << std::endl; //todo, CACHE should be name
 				break;
 		}
 	}else if(*p[0]>0){
 		index = -1;
-		for (iter = m_SEGLIST.begin() ; iter != m_SEGLIST.end() ; ++iter) {
+		for (iter = m_segment_list->begin() ; iter != m_segment_list->end() ; ++iter) {
 			index++; 
 			if (strcmp(iter->name().c_str(),p[1]) == 0) {
 				break;
@@ -140,10 +132,10 @@ tmpl(int)::PrintResource(modelResource *res,char **p)
 			i++;
 			if (*p[i] == (char)0) {
 				res->start = 	0;
-				res->len =  (iter->size() >> 2) / m_BLOCK_SIZE;
+				res->len =  (iter->size() / sram_param::B) / 8; // print by 8 data per line
 				res->usr1 = 1;
 			} else if (*p[i + 1] == (char)0) {
-				res->start = 	strtoul(p[i],&misc,0);
+				res->start = 	strtoul(p[i],&misc,0); // start est une adresse!
 				res->usr1 = 2;
 			} else {
 				res->start = 	strtoul(p[i],&misc,0);
@@ -151,7 +143,6 @@ tmpl(int)::PrintResource(modelResource *res,char **p)
 				res->usr1 = 1;
 			}
 			res->obj = this;
-			printf("Registering this = %x\n",(unsigned int )this);
 			res->usr2 = index;
 			return 0;
 		} else
@@ -163,7 +154,7 @@ tmpl(int)::PrintResource(modelResource *res,char **p)
 
 tmpl(int)::TestResource(modelResource *res,char **p)
 {
-#if 0
+#if 1
 int i = 1;
 int index;
 unsigned int address;
@@ -172,17 +163,24 @@ std::list<soclib::common::Segment>::iterator     iter;
 	/* Shall we make a specific error function for all
 	* print/display/test functions, so to be homogeneous */
 	
-#if 0
+#if 1
 	if (*p[i] == (char)0) {
 		fprintf(stderr, "needs a segment name argument!\n");
 		return -1;
 	}
 	index = -1 ;
+	for (iter = m_segment_list->begin() ; iter != m_segment_list->end() ; ++iter) {
+		index++; 
+		if (strcmp(iter->name().c_str(),p[1]) == 0) {
+			break;
+		}
+	}
+
 	if (index != -1) {
 		i++;
 		if (*p[i + 1] == (char)0) {
 			address = strtoul(p[i],&misc,0);
-			res->addr =    (int*)&r_RAM[index][((address & ~m_LSBMASK) - m_segment.base()) >> 2];
+			res->addr =    (int*)&s_RAM[index][(address - (iter -> baseAddress())) >> m_ADDR_WORD_SHIFT];
 			return 0;
 		}else
 			fprintf(stderr, "Error, expected: <segment> <addr>\n");
@@ -195,7 +193,6 @@ std::list<soclib::common::Segment>::iterator     iter;
 
 tmpl(int)::Resource(char **args)
 {
-#if 0
 	size_t  i = 1;
 	std::list<soclib::common::Segment>::iterator     iter;
 
@@ -212,12 +209,11 @@ tmpl(int)::Resource(char **args)
 	for (i = 0; i < sizeof(RAMessources)/sizeof(*RAMessources); i++)
 		fprintf(stdout,"%s\n",RAMessources[i]);
 	cout << "available segments : ";	
-	for (iter = m_SEGLIST.begin() ; iter != m_SEGLIST.end() ; ++iter) {
+	for (iter = m_segment_list -> begin() ; iter != m_segment_list -> end() ; ++iter) {
 		cout << iter->name() <<  " ";	
 	}
 	cout << std::endl;
-#endif
-	return 0;
+	return  0;
 }
 #endif
 }}

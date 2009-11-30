@@ -51,6 +51,13 @@ namespace caba {
 			// don't care about this and just copy the 32bits code (two words per data_t cells!)
 			assert(iter-> size() == m_size_bytes[i]);
 			temp = new uint32_t [iter -> size()/sram_param::B];
+
+			for (unsigned int j = 0; j < iter -> size()/sram_param::B; j++)
+			{
+				//temp[j] = 0xFEED0BAD; // initialisation
+				temp[j] = 0; // initialisation
+			}
+
 			m_loader.load(temp, iter -> baseAddress(), iter -> size());
 			for ( size_t addr = 0; addr < iter -> size()/sram_param::B; ++addr )
 			{
@@ -89,6 +96,12 @@ namespace caba {
 		}
 		else
 		{
+#if 0
+			std::cout << "sram mealy, write :" << " bk " << std::dec << bank_sel; 
+			std::cout << " offset " << std::hex << offset; 
+			std::cout << " be " << std::hex << be; 
+			std::cout << " wdata  " << std::hex << wdata << std::endl; 
+#endif
 			assert(we);
 			// TODO : this is a 32bits write!
 			for (unsigned int i = 0 ; i < sram_param::B; i++)

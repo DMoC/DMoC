@@ -256,5 +256,5 @@ void SOCLIB_DIRECTORY::Print(void){
 
 SOCLIB_DIRECTORY::~SOCLIB_DIRECTORY(void){
 	assert(dir_slice != NULL);
-	delete dir_slice;
+	delete [] dir_slice;
 } 

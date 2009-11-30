@@ -112,6 +112,7 @@ namespace caba {
 	tmpl(/**/)::~VciCcRam()
 	{
 		delete c_core;
+		delete c_sram_32;
 		delete m_segment_list;
 	};
 
