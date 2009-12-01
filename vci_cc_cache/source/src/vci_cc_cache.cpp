@@ -210,7 +210,7 @@ tmpl(/**/)::VciCcCache(
 
 	s_ICACHE_TAG = soclib::common::alloc_elems<sc_signal<typename vci_param::addr_t> >("ICACHE_TAG", icache_lines);
 	r_RSP_DCACHE_MISS_BUF = soclib::common::alloc_elems<sc_signal<typename vci_param::data_t> >("RSP_DCACHE_MISS_BUFF", dcache_words);
-	r_RSP_ICACHE_MISS_BUF = soclib::common::alloc_elems<sc_signal<typename vci_param::data_t> >("RSP_DCACHE_MISS_BUFF", icache_words);
+	r_RSP_ICACHE_MISS_BUF = soclib::common::alloc_elems<sc_signal<typename vci_param::data_t> >("RSP_ICACHE_MISS_BUFF", icache_words);
 
 	SC_METHOD (transition);
 	sensitive_pos << p_clk;

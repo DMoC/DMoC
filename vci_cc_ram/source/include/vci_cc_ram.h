@@ -68,6 +68,13 @@ namespace caba{
 				soclib::caba::SRam<sram_param> * c_sram_32; // 32bits Sram
 			public :
 				soclib::caba::CcRamCore<vci_param,sram_param> * c_core;
+				//  DEBUG
+
+				sc_signal<sram_param::addr_t>   s_t1;
+				sc_signal<sram_param::addr_t>   s_t2;
+				sc_signal<sram_param::addr_t>   s_t3;
+				sc_signal<sram_param::addr_t>   s_t4;
+
 			private :
 
 				soclib::common::Loader					m_loader;
@@ -86,7 +93,6 @@ namespace caba{
 				sc_signal<bool>   s_ack_core2sram;
 				
 			
-
 
 				// IO PORTS
 			public :

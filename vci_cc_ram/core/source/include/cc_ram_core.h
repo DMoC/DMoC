@@ -96,8 +96,6 @@ namespace caba{
 				sc_in<bool>   p_sram_ack;  // rdata
 
 			public :
-				//  REGISTERS
-
 				// 2 FSM's
 				sc_signal<unsigned int>		r_RAM_FSM;
 				sc_signal<unsigned int>		r_INV_FSM;
