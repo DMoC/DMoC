@@ -94,11 +94,12 @@ namespace caba {
 		m_sram_bk = seg;
 
 		if ((((node_id == -1) && !s_DIRECTORY[seg][blocknum].Is_empty())
-				|| ((node_id != -1) && s_DIRECTORY[seg][blocknum].Is_Other(node_id)))
-				&& eop)
+				|| ((node_id != -1) && s_DIRECTORY[seg][blocknum].Is_Other(node_id))))
 		{
-			// Send invalidation only if it is the last cell of the paquet
-			// in order to avoid deadlocks, report to TODO point for an explanation 
+			// Send an invalidation if the block is shared by another prossesor(s).
+			// WARNING : this may cause deadlock issue (we should send invalidation only if
+			// is the eop ie: the request was comsumed), but in this later case the fd_access
+      // doesnt work because it sends bursts of more than s_cache_line_size.
 			r_RAM_FSM = RAM_DATA_INVAL;
 			r_SAV_ADDRESS = m_vci_fsm.getBase(seg)+addr;
 			r_SAV_SEGNUM = seg;
