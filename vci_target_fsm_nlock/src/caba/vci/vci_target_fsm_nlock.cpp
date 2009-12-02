@@ -130,7 +130,7 @@ tmpl(void)::handle_one()
 #endif
 			m_current_cmd.error = vci_param::ERR_GENERAL_DATA_ERROR;
 			std::cout << name() << " ERROR: address " << std::hex << address << " by " << std::dec <<  m_current_cmd.srcid <<" not for me" << std::endl;
-			raise(SIGINT);
+			sc_stop ();
 		} else {
 			assert(0&&"Receiving wrong req and not default target");
 		}
