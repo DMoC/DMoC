@@ -44,25 +44,6 @@ tmpl(void)::transition()
 
 	m_iss.getRequests( icache_req_port, dcache_req_port );
 
-	// Instruction cache requests
-	const typename vci_param::addr_t		icache_address = icache_req_port.addr;
-	const unsigned int	icache_y = m_i_y[icache_address];
-	const unsigned int	icache_x = m_i_x[icache_address];
-	const typename vci_param::addr_t		icache_z = m_i_z[icache_address] | V_BIT;
-	const bool		icache_hit = (icache_z == s_ICACHE_TAG[icache_y].read());
-	const bool		icache_req = icache_req_port.valid;
-
-
-	// Data cache requests
-	const typename vci_param::addr_t		dcache_address  = dcache_req_port.addr;
-	const typename vci_param::data_t		dcache_wdata  = dcache_req_port.wdata;
-	const unsigned int	dcache_x = m_d_x[dcache_address];
-	const unsigned int	dcache_y = m_d_y[dcache_address];
-	const typename vci_param::addr_t		dcache_z = m_d_z[dcache_address] | V_BIT;
-	const bool		dcache_hit = (dcache_z == s_DCACHE_TAG[dcache_y].read());
-	const bool		dcache_req = dcache_req_port.valid;
-	const typename iss_t::be_t dcache_be = dcache_req_port.be;
-	const int dcache_type = dcache_req_port.type;
 
 	// Invalidations
 	const typename vci_param::addr_t		dcache_inv_address = r_RAM_INV_ADDR;
@@ -135,25 +116,35 @@ tmpl(void)::transition()
 			break;
 
 		case ICACHE_IDLE :
-			if (!icache_req) break; // nothing to do
-			if (icache_hit) // the common case, return the instruction in the SAME cycle,
-											// this is the case beacause m_iss.executeNCycles is called AFTER 
-											// setting the values hereafter (.valid, and .instruction).
 			{
-				assert(icache_req);
-				icache_rsp_port.valid          = icache_hit;
-				icache_rsp_port.instruction    = s_ICACHE_DATA[icache_y][icache_x].read();
-				if ((s_ICACHE_DATA[icache_y][icache_x].read() == 0xFEED0BAD))
+				// Instruction cache requests
+				typename vci_param::addr_t		icache_address = icache_req_port.addr;
+				unsigned int	icache_y = m_i_y[icache_address];
+				unsigned int	icache_x = m_i_x[icache_address];
+				typename vci_param::addr_t		icache_z = m_i_z[icache_address] | V_BIT;
+				bool		icache_hit = (icache_z == s_ICACHE_TAG[icache_y].read());
+				bool		icache_req = icache_req_port.valid;
+
+				if (!icache_req) break; // nothing to do
+				if (icache_hit) // the common case, return the instruction in the SAME cycle,
+					// this is the case beacause m_iss.executeNCycles is called AFTER 
+					// setting the values hereafter (.valid, and .instruction).
+					{
+						assert(icache_req);
+						icache_rsp_port.valid          = icache_hit;
+						icache_rsp_port.instruction    = s_ICACHE_DATA[icache_y][icache_x].read();
+						if ((s_ICACHE_DATA[icache_y][icache_x].read() == 0xFEED0BAD))
+						{
+							std::cout << name() << "WARNING : processor reads an instruction  that it was probably not initialized," << std::endl;
+							std::cout << name() << "          it contained the magic 0xFEED0BAD set at allocation time of S-ram memory." << std::endl;
+						}
+					}
+				else // miss, issue a miss request and wait for the response
 				{
-					std::cout << name() << "WARNING : processor reads an instruction  that it was probably not initialized," << std::endl;
-					std::cout << name() << "          it contained the magic 0xFEED0BAD set at allocation time of S-ram memory." << std::endl;
+					r_ICACHE_MISS_ADDR_SAVE = icache_address;
+					r_ICACHE_FSM = ICACHE_WAIT;
+					r_ICACHE_MISS_REQ = true;
 				}
-			}
-			else // miss, issue a miss request and wait for the response
-			{
-				r_ICACHE_MISS_ADDR_SAVE = icache_address;
-				r_ICACHE_FSM = ICACHE_WAIT;
-				r_ICACHE_MISS_REQ = true;
 			}
 			break;
 
@@ -165,12 +156,17 @@ tmpl(void)::transition()
 			break;
 
 		case ICACHE_UPDT :
-			s_ICACHE_TAG[icache_y] = icache_z;
-			for (size_t i=0 ; i<s_icache_words ; i++) // Fill up the memory line
 			{
-				s_ICACHE_DATA[icache_y][i] = r_RSP_ICACHE_MISS_BUF[i];
+				unsigned int	icache_y = m_i_y[r_ICACHE_MISS_ADDR_SAVE.read()];
+				typename vci_param::addr_t		icache_z = m_i_z[r_ICACHE_MISS_ADDR_SAVE.read()] | V_BIT;
+
+				s_ICACHE_TAG[icache_y] = icache_z;
+				for (size_t i=0 ; i<s_icache_words ; i++) // Fill up the memory line
+				{
+					s_ICACHE_DATA[icache_y][i] = r_RSP_ICACHE_MISS_BUF[i];
+				}
+				r_ICACHE_FSM = ICACHE_IDLE; // Go to idle, the next cycle the request will hit in cache 
 			}
-			r_ICACHE_FSM = ICACHE_IDLE; // Go to idle, the next cycle the request will hit in cache 
 			break;
 
 		default : // an impossible case
@@ -212,6 +208,17 @@ tmpl(void)::transition()
 
 		case DCACHE_IDLE : 
 			{
+				// Data cache requests
+				typename vci_param::addr_t		dcache_address  = dcache_req_port.addr;
+				typename vci_param::data_t		dcache_wdata  = dcache_req_port.wdata;
+				unsigned int	dcache_x = m_d_x[dcache_address];
+				unsigned int	dcache_y = m_d_y[dcache_address];
+				typename vci_param::addr_t		dcache_z = m_d_z[dcache_address] | V_BIT;
+				bool		dcache_hit = (dcache_z == s_DCACHE_TAG[dcache_y].read());
+				bool		dcache_req = dcache_req_port.valid;
+				typename iss_t::be_t dcache_be = dcache_req_port.be;
+				int dcache_type = dcache_req_port.type;
+
 				bool dr_cached;
 				bool dr_ll = false;
 				bool dr_sc = false;
@@ -522,7 +529,18 @@ tmpl(void)::transition()
 					 it |= (1<<i);
 			}
 		}
-			m_iss.executeNCycles(1, icache_rsp_port, dcache_rsp_port, it);
+
+#if 0
+    std::cout << name () << "[===== " << ncycles << " ====]" << std::endl;
+
+    std::cout << name () << icache_req_port << std::endl;
+    std::cout << name () << icache_rsp_port << std::endl;
+
+    std::cout << name () << dcache_req_port << std::endl;
+    std::cout << name () << dcache_rsp_port << std::endl;
+#endif
+
+		m_iss.executeNCycles(1, icache_rsp_port, dcache_rsp_port, it);
 	}
 
 	switch ((req_fsm_state_e)r_VCI_REQ_FSM.read())

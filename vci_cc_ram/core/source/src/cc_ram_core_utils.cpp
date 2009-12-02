@@ -94,8 +94,7 @@ namespace caba {
 		m_sram_bk = seg;
 
 		if ((((node_id == -1) && !s_DIRECTORY[seg][blocknum].Is_empty())
-				|| ((node_id != -1) && s_DIRECTORY[seg][blocknum].Is_Other(node_id)))
-				&& eop)
+				|| ((node_id != -1) && s_DIRECTORY[seg][blocknum].Is_Other(node_id))))
 		{
 			// Send invalidation only if it is the last cell of the paquet
 			// in order to avoid deadlocks, report to TODO point for an explanation 

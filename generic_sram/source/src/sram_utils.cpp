@@ -54,7 +54,8 @@ namespace caba {
 
 			for (unsigned int j = 0; j < iter -> size()/sram_param::B; j++)
 			{
-				temp[j] = 0xFEED0BAD; // initialisation
+				//temp[j] = 0xFEED0BAD; // initialisation
+				temp[j] = 0; // initialisation
 			}
 
 			m_loader.load(temp, iter -> baseAddress(), iter -> size());
