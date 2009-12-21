@@ -19,7 +19,7 @@
 //#define DEBUG_M10
 #define DEBUG_M10_LEVEL 2
 //#define DEBUG_M9
-//#define DEBUG_M8
+#define DEBUG_MANOMETER
 //#define DEBUG_RAM
 #define DEBUG_RAM_LEVEL 3
 #define DEBUG_CACHE
@@ -77,8 +77,8 @@ typedef int counter_id_t;
 // process the memory module (in our case, 1 request => 11 cycles (8 words line)
 //#define SAT_THRESHOLD 877
 //#define THRES_P
-#define SAT_THRESHOLD 100000
-#define SAT_TIME_SLOT 10000000 
+#define SAT_TIME_SLOT 1000000 
+#define SAT_THRESHOLD (SAT_TIME_SLOT * 80 / 100)
 
 #define CONTENTION_THRESHOLD 3
 // Module_6

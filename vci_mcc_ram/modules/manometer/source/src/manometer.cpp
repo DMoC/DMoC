@@ -73,6 +73,7 @@ namespace caba {
 			r_nb_request	= 0;
 			r_MNTER_FSM      = MNTER_IDLE;
 			DCOUT << name() << " reset " << endl;
+			return;
 		}
 		m_cycles++;
 		switch ((mnter_fsm_state_e)r_MNTER_FSM.read())
@@ -81,6 +82,7 @@ namespace caba {
 
 				if (p_req.read()) // priority ovec core requests
 				{
+					assert(false);
 					switch (p_cmd.read())
 					{
 						case MNTER_CMD_READ :
@@ -110,10 +112,14 @@ namespace caba {
 						if (r_nb_request.read() > SAT_THRESHOLD) // raise contention
 						{
 							r_MNTER_FSM = MNTER_CONTENTION;
+							DCOUT << name() << " under contention! p"<< std::dec << r_pressure.read()  << std::endl;
 						}
+						else
+						{
+							DCOUT << name() << " pressure "<< std::dec << r_pressure.read() << std::endl;
+						}
+				
 
-						// Some traces
-						DCOUT << name() << " p  : " << dec << r_pressure << endl; 
 #ifdef USE_STATS
 						file_stats << " p  : " << dec << r_pressure << endl; 
 #endif
@@ -125,6 +131,7 @@ namespace caba {
 				}
 				break;
 
+#if 0
 			case  MNTER_CONTENTION :
 #ifndef QUICK_RAISE
 				if (p_contention_ack.read())
@@ -143,6 +150,7 @@ namespace caba {
 			case  MNTER_READ :
 				r_MNTER_FSM = MNTER_IDLE;
 			break;
+#endif
 
 			default :
 				assert(false);

@@ -193,6 +193,12 @@ msldfj
 		p_sram_be   = m_sram_be;
 		p_sram_addr = m_sram_addr;
 		p_sram_dout =  m_sram_wdata;
+
+#ifdef SENSITIVE_READ_ONLY
+		p_manometer_req = (m_sram_ce && m_sram_oe); // Contention mesured only on read requests
+#else
+		p_manometer_req = m_sram_ce; 
+#endif
 		m_sram_ce = false; // CE set for one cycle only
 	}; // end genMoore()
 }}

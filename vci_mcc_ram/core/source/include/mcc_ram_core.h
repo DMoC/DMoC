@@ -114,6 +114,9 @@ namespace caba{
 				sc_in<typename sram_param::data_t>   p_sram_din;  // rdata
 				sc_in<bool>   p_sram_ack;  // rdata
 
+				// Manometer interface
+				sc_out<bool>   p_manometer_req;
+
 				// Migration related ports
 #ifndef NOCTRL
 				sc_in<bool>   		p_ctrl_req;

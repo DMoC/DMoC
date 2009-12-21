@@ -34,6 +34,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <cstdio>
 
 
 namespace soclib {
@@ -66,30 +67,35 @@ namespace caba {
 	{
 
 		m_segment_list = new std::list<soclib::common::Segment>(mt -> getSegmentList(t_ident));
+		char generated_name[32];
+		sprintf(generated_name,"%s.core",(const char *)insname);
 
 		// Instanciate sub_modules
 #ifdef DEBUG_SRAM
-if (mt_inv == NULL) // Only one NoC for requests and invalidation, pass &mt instead of &mt_inv as "Mapping table for invalidations"
-{
-		c_core = new soclib::caba::MccRamCore<vci_param,sram_param>("c_core",node_zero,i_ident,t_ident,mt,mt,cct,nb_p,loader,line_size,table_cost,home_addr_table,nb_m);
-}
-else
-{
-		c_core = new soclib::caba::MccRamCore<vci_param,sram_param>("c_core",node_zero,i_ident,t_ident,mt,mt_inv,cct,nb_p,loader,line_size,table_cost,home_addr_table,nb_m);
-}
+		if (mt_inv == NULL) // Only one NoC for requests and invalidation, pass &mt instead of &mt_inv as "Mapping table for invalidations"
+		{
+			c_core = new soclib::caba::MccRamCore<vci_param,sram_param>(generated_name,node_zero,i_ident,t_ident,mt,mt,cct,nb_p,loader,line_size,table_cost,home_addr_table,nb_m);
+		}
+		else
+		{
+			c_core = new soclib::caba::MccRamCore<vci_param,sram_param>(generated_name,node_zero,i_ident,t_ident,mt,mt_inv,cct,nb_p,loader,line_size,table_cost,home_addr_table,nb_m);
+		}
 #else
-if (mt_inv == NULL) // Only one NoC for requests and invalidation, pass &mt instead of &mt_inv as "Mapping table for invalidations"
-{
-		c_core = new soclib::caba::MccRamCore<vci_param,sram_param>("c_core",node_zero,i_ident,t_ident,mt,mt,cct,nb_p,line_size,table_cost,home_addr_table,nb_m);
-}
-else
-{
-		c_core = new soclib::caba::MccRamCore<vci_param,sram_param>("c_core",node_zero,i_ident,t_ident,mt,mt_inv,cct,nb_p,line_size,table_cost,home_addr_table,nb_m);
-}
-c_sram_32 = new soclib::caba::SRam<sram_param>("c_sram",m_segment_list, loader);
+		if (mt_inv == NULL) // Only one NoC for requests and invalidation, pass &mt instead of &mt_inv as "Mapping table for invalidations"
+		{
+			c_core = new soclib::caba::MccRamCore<vci_param,sram_param>(generated_name,node_zero,i_ident,t_ident,mt,mt,cct,nb_p,line_size,table_cost,home_addr_table,nb_m);
+		}
+		else
+		{
+			c_core = new soclib::caba::MccRamCore<vci_param,sram_param>(generated_name,node_zero,i_ident,t_ident,mt,mt_inv,cct,nb_p,line_size,table_cost,home_addr_table,nb_m);
+		}
+
+		sprintf(generated_name,"%s.sram",(const char *)insname);
+		c_sram_32 = new soclib::caba::SRam<sram_param>(generated_name,m_segment_list, loader);
 #endif
 
-c_manometer = new soclib::caba::Manometer("c_manometer");
+		sprintf(generated_name,"%s.manometer",(const char *)insname);
+		c_manometer = new soclib::caba::Manometer(generated_name);
 
 		// some checks, we use a 32bits Sram and for now we don't manage "address conversions". 
 		assert(vci_param::N == 32);
@@ -111,6 +117,8 @@ c_manometer = new soclib::caba::Manometer("c_manometer");
 		c_core -> p_sram_dout(s_din_core2sram);
 		c_core -> p_sram_din(s_dout_core2sram);
 		c_core -> p_sram_ack(s_ack_core2sram);
+
+		c_core -> p_manometer_req(s_core_req_core2manometer);
 		// TODO manometer
 
 #ifndef DEBUG_SRAM
