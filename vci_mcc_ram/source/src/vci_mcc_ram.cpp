@@ -86,8 +86,10 @@ else
 {
 		c_core = new soclib::caba::MccRamCore<vci_param,sram_param>("c_core",node_zero,i_ident,t_ident,mt,mt_inv,cct,nb_p,line_size,table_cost,home_addr_table,nb_m);
 }
-		c_sram_32 = new soclib::caba::SRam<sram_param>("c_sram",m_segment_list, loader);
+c_sram_32 = new soclib::caba::SRam<sram_param>("c_sram",m_segment_list, loader);
 #endif
+
+c_manometer = new soclib::caba::Manometer("c_manometer");
 
 		// some checks, we use a 32bits Sram and for now we don't manage "address conversions". 
 		assert(vci_param::N == 32);
@@ -109,6 +111,7 @@ else
 		c_core -> p_sram_dout(s_din_core2sram);
 		c_core -> p_sram_din(s_dout_core2sram);
 		c_core -> p_sram_ack(s_ack_core2sram);
+		// TODO manometer
 
 #ifndef DEBUG_SRAM
 		c_sram_32 -> p_bk_sel(s_bk_core2sram);
@@ -121,6 +124,19 @@ else
 		c_sram_32 -> p_dout(s_dout_core2sram);
 		c_sram_32 -> p_ack(s_ack_core2sram);
 #endif
+
+		c_manometer -> p_clk(p_clk);
+		c_manometer -> p_resetn(p_resetn);
+		c_manometer -> p_core_req(s_core_req_core2manometer);
+		c_manometer -> p_req(s_req_x2manometer);
+		c_manometer -> p_cmd(s_cmd_x2manometer);
+		c_manometer -> p_contention_ack(s_contention_ack_x2manometer);
+
+		c_manometer -> p_valid(s_valid_manometer2x);
+		c_manometer -> p_contention(s_contention_manometer2x);
+		c_manometer -> p_ack(s_ack_manometer2x);
+		c_manometer -> p_pressure(s_pressure_manometer2x);
+		// TODO other inputs
 
 		SC_METHOD (Transition);
 		sensitive_pos << p_clk;

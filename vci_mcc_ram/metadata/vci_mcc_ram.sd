@@ -19,6 +19,7 @@ Module('caba:vci_mcc_ram_sls',
 	],
 	uses = [
 		Uses('caba:mcc_ram_core'),
+		Uses('caba:mcc_ram_manometer'),
 		Uses('caba:sram'),
 		Uses('caba:sram_param'),
 		Uses('caba:base_module'),

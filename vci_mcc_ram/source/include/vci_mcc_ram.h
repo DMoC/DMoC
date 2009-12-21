@@ -41,6 +41,7 @@
 #include "mcc_ram_core.h"
 #include "sram.h"
 #include "sram_param.h"
+#include "manometer.h"
 
 #include "mapping_table.h"
 #include "loader.h"
@@ -69,6 +70,7 @@ namespace caba{
 				soclib::caba::SRam<sram_param> * c_sram_32; // 32bits Sram
 #endif
 				soclib::caba::MccRamCore<vci_param,sram_param> * c_core;
+				soclib::caba::Manometer * c_manometer; // a manometer to detect contention
 
 				soclib::common::Loader					m_loader;
 				soclib::common::MappingTable		m_MapTab;			
@@ -84,6 +86,19 @@ namespace caba{
 				sc_signal<typename sram_param::data_t>   s_din_core2sram;
 				sc_signal<typename sram_param::data_t>   s_dout_core2sram;
 				sc_signal<bool>   s_ack_core2sram;
+
+				// Interconnection signals : c_core -> c_manometer
+				sc_signal<bool>	s_core_req_core2manometer;
+				
+				sc_signal<bool>	s_contention_ack_x2manometer;
+				sc_signal< Manometer::mnter_cmd_t >	s_cmd_x2manometer;
+				sc_signal<bool>	s_req_x2manometer;
+
+				sc_signal<bool>	s_valid_manometer2x;
+				sc_signal<bool>	s_contention_manometer2x;
+				sc_signal<bool>	s_ack_manometer2x;
+				sc_signal< Manometer::mnter_pressure_t>	s_pressure_manometer2x;
+
 				
 			
 
@@ -108,7 +123,7 @@ namespace caba{
 						addr_to_homeid_entry_t * home_addr_table,		// Used to convert node_id <-> memory_segment_base_address
 						unsigned int nb_m,													// Number of memory nodes (used in migration)
 						const soclib::common::MappingTable * mt,			// Mapping Table for read/write requets
-						const soclib::common::MappingTable * mt_inv  // Mapping Table for invalidation requests (alternative NoC). 
+						const soclib::common::MappingTable * mt_inv = NULL // Mapping Table for invalidation requests (alternative NoC). 
 						);
 
 				~VciMccRam();  

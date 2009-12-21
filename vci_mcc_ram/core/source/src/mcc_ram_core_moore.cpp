@@ -55,8 +55,6 @@ namespace caba {
 			case RAM_PAGE_TABLE_DIR_SAVE :
 			case RAM_PAGE_TABLE_DIR_UPDT :
 				// Ack for Ctrl request
-				p_t_vci.cmdack = false;
-				p_t_vci.rspval = false;
 #ifndef NOCTRL
 				p_ctrl_out_data_0 = 0;
 				p_ctrl_out_cmd = CTRL_NOP;
@@ -67,8 +65,6 @@ namespace caba {
 
 			case RAM_TLB_INV_OK :
 				// send CTRL_INV_OK to ctrl module (ie. we received all the ACK's for the TLB invalidations) 
-				p_t_vci.cmdack = false;
-				p_t_vci.rspval = false;
 #ifndef NOCTRL
 				p_ctrl_out_data_0 = 0;
 				p_ctrl_out_cmd = CTRL_INV_OK;
@@ -79,8 +75,6 @@ namespace caba {
 
 			case RAM_POISON :
 				// Ack for Ctrl request AND send the virtual address of the page to be poisonned
-				p_t_vci.cmdack = false;
-				p_t_vci.rspval = false;
 #ifndef NOCTRL
 				p_ctrl_out_data_0 = r_VIRT_POISON_PAGE.read();
 				p_ctrl_out_cmd = CTRL_VIRT_PP;
@@ -109,8 +103,6 @@ namespace caba {
 			case RAM_DATA_INVAL_WAIT :
 			case RAM_TLB_INVAL :
 			case RAM_DIRUPD :
-				p_t_vci.cmdack = false;
-				p_t_vci.rspval = false;
 #ifndef NOCTRL
 msldfj
 				p_ctrl_out_data_0 = 0;

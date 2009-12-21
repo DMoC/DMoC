@@ -93,8 +93,8 @@ namespace caba {
 		m_sram_ce = true;
 		m_sram_bk = seg;
 
-		if ((((node_id == -1) && !s_DIRECTORY[seg][blocknum].Is_empty())
-				|| ((node_id != -1) && s_DIRECTORY[seg][blocknum].Is_Other(node_id))))
+		if (((node_id == -1) && !s_DIRECTORY[seg][blocknum].Is_empty())
+				|| ((node_id != -1) && s_DIRECTORY[seg][blocknum].Is_Other(node_id)))
 		{
 			// Send invalidation only if it is the last cell of the paquet
 			// in order to avoid deadlocks, report to TODO point for an explanation 
@@ -123,11 +123,7 @@ namespace caba {
 
 		r_IN_TRANSACTION = !eop;
 #ifdef DEADLOCK_NACK_POLICY
-		if (s_POISONNED[page_index])
-		{ 
-			m_last_write_nack = !eop;
-			return false;
-		}
+		#error ceci n'est pas supporté par ici
 #endif
 
 		// Save request in all cases, and set correct values for

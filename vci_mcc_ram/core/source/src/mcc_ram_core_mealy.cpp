@@ -56,6 +56,11 @@ namespace caba {
 				// the correct value on the vci port.	
 				m_vci_fsm . genMoore();
 		}
+		else
+		{
+				p_t_vci.cmdack = false;
+				p_t_vci.rspval = false;
+		}
 	};
 #endif
 }}

@@ -309,6 +309,7 @@ namespace caba {
 
 		private:
 
+		int address_to_id(typename vci_param::addr_t addr);
 		typename vci_param::data_t be_to_mask(typename iss_t::be_t be);
 		void transition();
 		void genMoore();

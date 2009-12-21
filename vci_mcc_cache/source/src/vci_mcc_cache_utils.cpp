@@ -34,11 +34,11 @@ namespace caba {
 
 tmpl(typename vci_param::data_t)::be_to_mask(typename iss_t::be_t be)
 {
-    size_t i;
+    int i;
     typename vci_param::data_t ret = 0;
-    const typename iss_t::be_t be_up = (1<<(sizeof(typename vci_param::data_t)-1));
+    const typename iss_t::be_t be_up = (1<<(vci_param::B -1));
 
-    for (i=0; i<sizeof(typename vci_param::data_t); ++i)
+    for (i=0 ; i < vci_param::B ; ++i)
 		{
         ret <<= 8;
         if ( be_up & be )

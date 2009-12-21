@@ -95,6 +95,10 @@ namespace caba {
 		m_nbcycles = 0;
 		m_last_write_nack = false;
 
+		m_sram_oe = false;
+		m_sram_we = false;
+		m_sram_ce = false;
+
 		CTOR_OUT
 
 
@@ -113,6 +117,8 @@ namespace caba {
 #ifndef DEBUG_SRAM
 		SC_METHOD (genMealy);
 		sensitive << p_sram_ack;
+		sensitive << p_sram_din;
+		sensitive_neg << p_clk;
 		dont_initialize();
 #endif
 

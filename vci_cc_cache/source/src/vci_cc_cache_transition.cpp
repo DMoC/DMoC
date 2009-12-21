@@ -495,7 +495,7 @@ tmpl(void)::transition()
 			}
 
 		case DCACHE_CPUINVAL :
-			{	
+			{
 				const int y = m_d_y[r_DCACHE_ADDR_SAVE.read()];
 				s_DCACHE_TAG[y] = 0;
 				r_DCACHE_FSM = DCACHE_IDLE;     
@@ -526,7 +526,7 @@ tmpl(void)::transition()
 		for (size_t i=0; i<(size_t)iss_t::n_irq; i++)
 		{
 			if(p_irq[i].read()) {
-					 it |= (1<<i);
+				it |= (1<<i);
 			}
 		}
 
