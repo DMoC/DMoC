@@ -42,6 +42,10 @@ const unsigned int TLB_SIZE = 8;
 const unsigned int PAGE_SIZE = 512;
 #endif
 
+// Manometer
+#define SAT_TIME_SLOT 100000
+#define SAT_THRESHOLD (SAT_TIME_SLOT * 80 / 100)
+
 #define MAX_NODES 128
 #define MAX_PAGES 0x8000
 
@@ -73,12 +77,6 @@ typedef int counter_id_t;
 // Module_8
 
 
-// SAT_THRESHOLD : 80% of how many requests per SAT_TIME_SLOT period can
-// process the memory module (in our case, 1 request => 11 cycles (8 words line)
-//#define SAT_THRESHOLD 877
-//#define THRES_P
-#define SAT_TIME_SLOT 1000000 
-#define SAT_THRESHOLD (SAT_TIME_SLOT * 80 / 100)
 
 #define CONTENTION_THRESHOLD 3
 // Module_6

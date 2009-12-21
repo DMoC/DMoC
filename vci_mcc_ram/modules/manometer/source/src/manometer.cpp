@@ -76,6 +76,7 @@ namespace caba {
 			return;
 		}
 		m_cycles++;
+
 		switch ((mnter_fsm_state_e)r_MNTER_FSM.read())
 		{
 			case MNTER_IDLE :
@@ -89,9 +90,8 @@ namespace caba {
 							r_MNTER_FSM = MNTER_READ;
 							break;
 
-						case MNTER_CMD_RESET : // Rese sent by another module
-							r_pressure = 0;
-							r_nb_request = 0;
+						case MNTER_CMD_RESET : // Reset sent by another module
+							r_MNTER_FSM = MNTER_RESET;
 							break;
 
 						default :
@@ -101,37 +101,18 @@ namespace caba {
 				}
 				else if (p_core_req.read())
 				{
-					if ((m_cycles % SAT_TIME_SLOT) == 0)
+					r_nb_request = r_nb_request.read() + 1;
+				}
+				else if (m_cycles >=  SAT_TIME_SLOT)
 					// Compute each SAT_TIME_SLOT pressure value and determine
 					// if it is necessary to raise a contention signal :
 					// ( pressure > SAT_THRESHOLD )
-					{	
-						r_pressure = r_nb_request;
-						r_nb_request = 0;
-						m_cycles = 0;
-						if (r_nb_request.read() > SAT_THRESHOLD) // raise contention
-						{
-							r_MNTER_FSM = MNTER_CONTENTION;
-							DCOUT << name() << " under contention! p"<< std::dec << r_pressure.read()  << std::endl;
-						}
-						else
-						{
-							DCOUT << name() << " pressure "<< std::dec << r_pressure.read() << std::endl;
-						}
-				
-
-#ifdef USE_STATS
-						file_stats << " p  : " << dec << r_pressure << endl; 
-#endif
-					}
-					else
-					{
-						r_nb_request = r_nb_request.read() + 1;
-					}
+				{	
+					r_MNTER_FSM = MNTER_COMPUTE;
 				}
 				break;
 
-#if 0
+#if 1
 			case  MNTER_CONTENTION :
 #ifndef QUICK_RAISE
 				if (p_contention_ack.read())
@@ -140,17 +121,42 @@ namespace caba {
 					r_MNTER_FSM = MNTER_IDLE;
 				}
 #else
-	// Idea : don't wait for acknowlegde, the contention signal is up for only
-	// one cycle, if it is missed by the target module it will probably raise
-	// again on the next time slot
-	#error not implemented
+				// Idea : don't wait for acknowlegde, the contention signal is up for only
+				// one cycle, if it is missed by the target module it will probably raise
+				// again on the next time slot
+#error not implemented
 #endif
-			break;
+				break;
 
 			case  MNTER_READ :
 				r_MNTER_FSM = MNTER_IDLE;
-			break;
+				break;
+
+			case  MNTER_RESET :
+				r_MNTER_FSM = MNTER_IDLE;
+				r_pressure = 0;
+				r_nb_request = 0;
+				break;
 #endif
+			case  MNTER_COMPUTE :
+				r_pressure = r_nb_request;
+				r_nb_request = 0;
+				m_cycles = 0;
+				if (r_nb_request.read() > SAT_THRESHOLD) // raise contention
+				{
+					//	r_MNTER_FSM = MNTER_CONTENTION;
+					DCOUT << name() << " contention detected  pressure : "<< std::dec << r_nb_request.read()  << std::endl;
+					DCOUT << name() << " SAT_THRESHOLD is : "<< std::dec << (SAT_THRESHOLD) << std::endl;
+				}
+				else
+				{
+					r_MNTER_FSM = MNTER_IDLE;
+					DCOUT << name() << "pressure "<< std::dec << r_nb_request.read() << " <=> " << (r_nb_request.read() * 100 / SAT_TIME_SLOT) << std::endl;
+#ifdef USE_STATS
+					file_stats << " p  : " << dec << r_pressure << endl; 
+#endif
+				}
+				break;
 
 			default :
 				assert(false);
@@ -183,6 +189,12 @@ namespace caba {
 				p_ack		 = false;
 				p_valid		 = true; // ouput value
 				p_pressure	 = r_pressure.read();
+			break;
+
+			case  MNTER_COMPUTE :
+				p_contention = false;
+				p_ack		 = false;
+				p_valid		 = false; // ouput value
 			break;
 
 			default :

@@ -85,6 +85,8 @@ class Manometer : public soclib::caba::BaseModule {
 		{
 			MNTER_IDLE,
 			MNTER_READ,
+			MNTER_RESET,
+			MNTER_COMPUTE,
 			MNTER_CONTENTION
 		};
 
