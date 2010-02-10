@@ -50,8 +50,7 @@ const unsigned int PAGE_SIZE = 512;
 #define MAX_PAGES 0x8000
 
 // Module_9
-typedef unsigned int counter_t;
-typedef int counter_id_t;
+#define CPT_TIME 3
 
 #define NBIT_ORDER 1
 
