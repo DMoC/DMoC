@@ -117,6 +117,12 @@ namespace caba{
 				// Manometer interface
 				sc_out<bool>   p_manometer_req;
 
+				// Counters interface
+				sc_out< bool >			p_counters_enable;
+				sc_out< sc_uint<32> >	p_counters_page_sel;
+				sc_out< sc_uint<32> >	p_counters_node_id; // TODO width can be reduced
+				sc_out< sc_uint<32> >	p_counters_cost;    // TODO set types correctly
+
 				// Migration related ports
 #ifndef NOCTRL
 				sc_in<bool>   		p_ctrl_req;

@@ -66,12 +66,16 @@ class Counters : public soclib::caba::BaseModule {
 		sc_in< bool > p_resetn;
 
 		// Core interface
-		sc_in< sc_uint<32> > p_enable;
+		sc_in< bool >		 p_enable;
 		sc_in< sc_uint<32> > p_page_sel;
 		sc_in< sc_uint<32> > p_node_id; // TODO width can be reduced
-		sc_in< sc_uint<32> > p_cost;
+		sc_in< sc_uint<32> > p_cost;    // TODO set types correctly
 
-		// Core interface
+		// TODOXXX implement cost, page_sel etc in core (or in s_ram ?), maybe
+		// has nothing to do with core!
+		// test if every thing is working fine
+
+		// Control interface
 		sc_in< bool >		p_req;	
 		sc_in< cter_cmd_t >	p_cmd;	
 		sc_in< sc_uint < 32 > > p_page_id;	

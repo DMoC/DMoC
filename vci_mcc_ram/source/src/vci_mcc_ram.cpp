@@ -119,7 +119,8 @@ namespace caba {
 		c_core -> p_sram_ack(s_ack_core2sram);
 
 		c_core -> p_manometer_req(s_core_req_core2manometer);
-		// TODO manometer
+
+		c_core -> p_ // TODO ports
 
 #ifndef DEBUG_SRAM
 		c_sram_32 -> p_bk_sel(s_bk_core2sram);

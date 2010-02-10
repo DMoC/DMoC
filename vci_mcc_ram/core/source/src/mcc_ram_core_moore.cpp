@@ -200,5 +200,7 @@ msldfj
 		p_manometer_req = m_sram_ce; 
 #endif
 		m_sram_ce = false; // CE set for one cycle only
+
+	
 	}; // end genMoore()
 }}

@@ -42,6 +42,7 @@
 #include "sram.h"
 #include "sram_param.h"
 #include "manometer.h"
+#include "counters.h"
 
 #include "mapping_table.h"
 #include "loader.h"
@@ -71,6 +72,7 @@ namespace caba{
 #endif
 				soclib::caba::MccRamCore<vci_param,sram_param> * c_core;
 				soclib::caba::Manometer * c_manometer; // a manometer to detect contention
+				soclib::caba::Manometer * c_counters;  // counters to compute page access
 
 				soclib::common::Loader					m_loader;
 				soclib::common::MappingTable		m_MapTab;			
@@ -98,6 +100,12 @@ namespace caba{
 				sc_signal<bool>	s_contention_manometer2x;
 				sc_signal<bool>	s_ack_manometer2x;
 				sc_signal< Manometer::mnter_pressure_t>	s_pressure_manometer2x;
+
+				// Interconnection signals : c_core -> c_counters
+				sc_signal< bool >			s_enable_core2counters;
+				sc_signal< sc_uint<32> >	s_page_sel_core2counters;
+				sc_signal< sc_uint<32> >	s_node_id_core2counters;
+				sc_signal< sc_uint<32> >	s_cost_core2counters;
 
 				
 			
