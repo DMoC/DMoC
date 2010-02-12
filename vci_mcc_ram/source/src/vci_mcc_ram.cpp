@@ -96,6 +96,8 @@ namespace caba {
 
 		sprintf(generated_name,"%s.manometer",(const char *)insname);
 		c_manometer = new soclib::caba::Manometer(generated_name);
+		sprintf(generated_name,"%s.counters", (const char *)insname);
+		c_counters = new soclib::caba::Counters(generated_name, nb_p, m_segment_list -> begin () -> size() / PAGE_SIZE, m_segment_list -> begin() -> baseAddress() , PAGE_SIZE);
 
 		// some checks, we use a 32bits Sram and for now we don't manage "address conversions". 
 		assert(vci_param::N == 32);

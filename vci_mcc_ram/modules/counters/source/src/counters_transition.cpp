@@ -74,6 +74,8 @@ namespace caba {
 			r_index_p = 0;
 			r_raise_threshold = false;
 			m_raise_threshold = false;
+			r_CTER_FSM = CTER_IDLE;
+			D_COUNTERS_COUT << " reset done  " << endl;
 			return;
 		}	
 
@@ -120,14 +122,14 @@ namespace caba {
 					const unsigned int max_p = r_max_page;
 
 					assert(p < m_NB_PAGES);
-					assert(c == 1);
 					assert(max_p < m_NB_PAGES);
 
 					// Only compute page access for processor modules
 					// This may introduce error in top3 since contention may appear (module_8) due to
 					// heavy DMA acces to pages not acccessed by a processor
-					D_COUNTERS_COUT <<  name() << " p_in_page_sel->" << r_save_page_sel <<  endl;
-					D_COUNTERS_COUT <<  name() << " p_in_node_id->" << r_save_node_id <<  endl;
+					D_COUNTERS_COUT <<  name() << " p_in_page_sel->" << r_save_page_sel
+									<< " p_in_node_id->" << r_save_node_id
+									<< " p_in_cost->" << r_save_cost <<  endl;
 					{
 						// some check
 						counter_t sum = 0;

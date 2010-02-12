@@ -191,8 +191,8 @@ msldfj
         p_counters_node_id	= m_counters_node_id;
         p_counters_cost		= m_counters_cost;
 
+		if (m_counters_enable == true) m_counters_cost = 0;
 		m_counters_enable = false;
-		m_counters_cost = 0;
 
 
 		p_sram_bk   = m_sram_bk;

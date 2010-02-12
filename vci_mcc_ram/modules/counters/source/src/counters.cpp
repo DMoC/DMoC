@@ -76,6 +76,7 @@ Counters::Counters(sc_module_name insname,unsigned int nb_nodes,unsigned int nb_
 		assert(is_pow2(m_NB_NODES));
 		// allocation des tableaux de compteurs
 		CTOR_OUT
+		cout << insname << "nb_nodes " << std::dec << nb_nodes << " nb_pages " << nb_pages << std::hex << " base_addr " << base_addr << " size " << page_size << std::endl;
 #ifdef USE_STATS
 		stats_chemin = "./";
 		stats_chemin += m_name.c_str();
@@ -93,6 +94,13 @@ Counters::Counters(sc_module_name insname,unsigned int nb_nodes,unsigned int nb_
 			r_counters[i] = new  sc_signal< counter_t >  [m_NB_NODES];
 		}
 
+		SC_METHOD (transition);
+		sensitive_pos << p_clk;
+		dont_initialize();
+
+		SC_METHOD (genMoore);
+		sensitive_neg << p_clk;
+		dont_initialize();
 	}
 
 Counters::~Counters(){	

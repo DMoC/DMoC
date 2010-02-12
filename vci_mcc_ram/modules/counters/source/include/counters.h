@@ -32,7 +32,7 @@
 #include <systemc>
 #include "mcc_globals.h"
 #include "caba_base_module.h"
-
+#define DEBUG_COUNTERS
 #ifdef DEBUG_COUNTERS
 	#define D_COUNTERS_COUT cout
 #else
