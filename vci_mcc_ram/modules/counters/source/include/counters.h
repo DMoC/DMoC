@@ -34,9 +34,9 @@
 #include "caba_base_module.h"
 
 #ifdef DEBUG_COUNTERS
-	#define DCOUT cout
+	#define D_COUNTERS_COUT cout
 #else
-	#define DCOUT if(0) cout
+	#define D_COUNTERS_COUT if(0) cout
 #endif
 namespace soclib {
 namespace caba {
@@ -76,6 +76,8 @@ class Counters : public soclib::caba::BaseModule {
 		// test if every thing is working fine
 
 		// Control interface
+#define NO_CTRL
+#ifndef NO_CTRL
 		sc_in< bool >		p_req;	
 		sc_in< cter_cmd_t >	p_cmd;	
 		sc_in< sc_uint < 32 > > p_page_id;	
@@ -86,6 +88,7 @@ class Counters : public soclib::caba::BaseModule {
 
 		// ?
 		sc_in< bool >		p_freeze;
+#endif
 		
 
 		// ? interface

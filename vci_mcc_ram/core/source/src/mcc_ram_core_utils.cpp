@@ -157,6 +157,12 @@ namespace caba {
 			r_SAV_BLOCKNUM = blocknum;
 			r_SAV_SCRID = source_id;
 		}
+
+		m_counters_page_sel = page_index;
+		m_counters_cost++; // TODO, dynamic cost, for instance is paquet lenght!	
+		m_counters_enable = eop;	
+		m_counters_node_id = node_id;
+
 		return true;
 	}
 
@@ -198,6 +204,10 @@ namespace caba {
 		m_sram_ce = true;
 		m_sram_bk = seg;
 		
+		m_counters_page_sel = page_index;
+		m_counters_cost++; // TODO, dynamic cost, for instance is paquet lenght!	
+		m_counters_enable = eop;	
+		m_counters_node_id = node_id;
 
 		m_fsm_data = &data; // save the data location pointer, will be set in genMealy function.
 

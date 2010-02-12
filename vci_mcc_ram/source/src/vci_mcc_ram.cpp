@@ -120,7 +120,10 @@ namespace caba {
 
 		c_core -> p_manometer_req(s_core_req_core2manometer);
 
-		c_core -> p_ // TODO ports
+		c_core -> p_counters_enable(s_enable_core2counters);
+		c_core -> p_counters_page_sel(s_page_sel_core2counters);
+		c_core -> p_counters_node_id(s_node_id_core2counters);
+		c_core -> p_counters_cost(s_cost_core2counters);
 
 #ifndef DEBUG_SRAM
 		c_sram_32 -> p_bk_sel(s_bk_core2sram);
@@ -145,7 +148,27 @@ namespace caba {
 		c_manometer -> p_contention(s_contention_manometer2x);
 		c_manometer -> p_ack(s_ack_manometer2x);
 		c_manometer -> p_pressure(s_pressure_manometer2x);
-		// TODO other inputs
+
+		c_counters -> p_clk(p_clk);
+		c_counters -> p_resetn(p_resetn);
+
+		c_counters -> p_enable(s_enable_core2counters);
+		c_counters -> p_page_sel(s_page_sel_core2counters);
+		c_counters -> p_node_id(s_node_id_core2counters);
+		c_counters -> p_cost(s_cost_core2counters);
+
+		c_counters -> p_contention(s_contention_counters2ctrl);	
+
+#if 0 // TODO
+		c_counters -> p_req;	
+		c_counters -> p_cmd;	
+		c_counters -> p_page_id;	
+		c_counters -> p_ack;	
+		c_counters -> p_valid;	
+		c_counters -> p_freeze;
+		c_counters -> p_outpu;
+#endif
+
 
 		SC_METHOD (Transition);
 		sensitive_pos << p_clk;
@@ -155,6 +178,9 @@ namespace caba {
 	tmpl(/**/)::~VciMccRam()
 	{
 		delete c_core;
+		delete c_sram_32;
+		delete c_manometer;
+		delete c_counters;
 		delete m_segment_list;
 	};
 

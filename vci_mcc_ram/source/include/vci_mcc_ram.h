@@ -72,7 +72,7 @@ namespace caba{
 #endif
 				soclib::caba::MccRamCore<vci_param,sram_param> * c_core;
 				soclib::caba::Manometer * c_manometer; // a manometer to detect contention
-				soclib::caba::Manometer * c_counters;  // counters to compute page access
+				soclib::caba::Counters * c_counters;  // counters to compute page access
 
 				soclib::common::Loader					m_loader;
 				soclib::common::MappingTable		m_MapTab;			
@@ -106,6 +106,8 @@ namespace caba{
 				sc_signal< sc_uint<32> >	s_page_sel_core2counters;
 				sc_signal< sc_uint<32> >	s_node_id_core2counters;
 				sc_signal< sc_uint<32> >	s_cost_core2counters;
+
+				sc_signal< bool >	s_contention_counters2ctrl;
 
 				
 			

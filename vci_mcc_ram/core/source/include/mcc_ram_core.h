@@ -166,6 +166,11 @@ namespace caba{
 				bool													m_sram_we;
 				bool													m_sram_ce;
 				typename sram_param::bk_t			m_sram_bk;
+
+				uint32_t m_counters_page_sel;
+				uint32_t m_counters_cost; 
+				bool     m_counters_enable;	
+				uint32_t m_counters_node_id;
 			
 
 				// Vci invalidation request

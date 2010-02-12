@@ -46,12 +46,14 @@ namespace caba {
 	{
 		const bool			p_in_enable		= p_enable.read();
 
+		const unsigned int	p_in_node_id	= p_node_id.read();
+	
+#ifndef NO_CTRL
+		const bool			p_in_freeze		= p_freeze.read();
 		const bool			p_in_req		= p_req.read();
 		const cter_cmd_t	p_in_cmd		= p_cmd.read();
 		const unsigned int	p_in_page_id	= p_page_id.read();
-		const unsigned int	p_in_node_id	= p_node_id.read();
-	
-		const bool			p_in_freeze		= p_freeze.read();
+#endif
 
 #if 0
 		const bool p_in_freeze				= p_freeze.read();
@@ -79,6 +81,7 @@ namespace caba {
 		{
 			case CTER_IDLE :
 				r_raise_threshold = false;
+#ifndef NO_CTRL
 				if (p_in_req) // If a command request (read, write etc)
 				{
 					switch ( p_in_cmd )
@@ -88,6 +91,7 @@ namespace caba {
 							break;
 					}
 				}
+#endif
 
 				if (p_in_enable) // Else, compute any access to a page
 				{
@@ -122,8 +126,8 @@ namespace caba {
 					// Only compute page access for processor modules
 					// This may introduce error in top3 since contention may appear (module_8) due to
 					// heavy DMA acces to pages not acccessed by a processor
-					DCOUT <<  name() << " p_in_page_sel->" << r_save_page_sel <<  endl;
-					DCOUT <<  name() << " p_in_node_id->" << r_save_node_id <<  endl;
+					D_COUNTERS_COUT <<  name() << " p_in_page_sel->" << r_save_page_sel <<  endl;
+					D_COUNTERS_COUT <<  name() << " p_in_node_id->" << r_save_node_id <<  endl;
 					{
 						// some check
 						counter_t sum = 0;
@@ -139,7 +143,7 @@ namespace caba {
 					// Increment page acces cost for [page_number][node_id] and global counter[page_number]
 					if ((counter_t)((counter_t)r_global_counters[p] + c ) < (counter_t)r_global_counters[p]){
 						// overflow of this counter, reset the line
-						DCOUT << name() << "OVERFLOW" << endl;
+						D_COUNTERS_COUT << name() << "OVERFLOW" << endl;
 						for (unsigned int i = 0; i < m_NB_NODES; i++){
 							r_counters[p][i] = 0;
 							r_global_counters[p] = 0;
@@ -160,7 +164,7 @@ namespace caba {
 						if (r_counters[p][n] M9_COMP_OP PE_PERIOD) m_raise_threshold = true;
 #endif
 
-						DCOUT << name() << "page->" << p << " value->" << r_global_counters[p] << endl;
+						D_COUNTERS_COUT << name() << "page->" << p << " value->" << r_global_counters[p] << endl;
 					}
 
 					// Computation takes 

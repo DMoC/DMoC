@@ -37,11 +37,19 @@ void Counters::genMoore( void ){
 	{
 		case CTER_IDLE :
 			p_contention = r_raise_threshold; 
+#ifndef NO_CTRL
 			p_output = 0; 
+			p_ack = 0;	
+			p_valid = 0;	
+#endif
 			break;
 		default :
 			p_contention = false; 
+#ifndef NO_CTRL
 			p_output = 0; 
+			p_ack = 0;	
+			p_valid = 0;	
+#endif
 			break;
 
 	}
