@@ -1,0 +1,11 @@
+
+# -*- python -*-
+
+Module('caba:mig_control_sls',
+	classname = 'soclib::caba::MigControl',
+	header_files = ['../source/include/mig_control.h'],
+	implementation_files = ['../source/src/mig_control.cpp'],
+	uses = [
+		Uses('caba:globals_sls'),
+	],
+)
