@@ -28,7 +28,7 @@
 
 #ifndef MCC_RAM_CORE_H
 #define MCC_RAM_CORE_H
-#define NOCTRL
+//#define NOCTRL
 
 #include <inttypes.h>
 #include <systemc>
@@ -46,6 +46,8 @@
 #include "phys_page_table.h"
 #include "soclib_directory.h" 
 #include <string>
+
+#include "mig_control.h"
 
 #if 0
 #define DEBUG_SRAM
@@ -124,17 +126,17 @@ namespace caba{
 				sc_out< sc_uint<32> >	p_counters_cost;    // TODO set types correctly
 
 				// Migration related ports
-#ifndef NOCTRL
-				sc_in<bool>   		p_ctrl_req;
-				sc_in<uint32_t>   p_ctrl_in_cmd;
-				sc_in<uint32_t>   p_ctrl_in_data_0;
-				sc_in<uint32_t>   p_ctrl_in_data_1;
-				sc_in<bool>  			p_ctrl_rsp_ack; 
+#ifndef NO_CTRL
+				sc_in<bool>   	  p_in_ctrl_req;
+				sc_in<uint32_t>   p_in_ctrl_cmd;
+				sc_in<uint32_t>   p_in_ctrl_data_0;
+				sc_in<uint32_t>   p_in_ctrl_data_1;
+				sc_in<bool>       p_in_ctrl_rsp_ack; 
 
-				sc_out<bool>  		p_ctrl_req_ack; 
-				sc_out<uint32_t>  p_ctrl_out_cmd;
-				sc_out<bool>  		p_ctrl_rsp; 
-				sc_out<uint32_t>  p_ctrl_out_data_0; 
+				sc_out<bool>  	  p_out_ctrl_req_ack; 
+				sc_out<uint32_t>  p_out_ctrl_cmd;
+				sc_out<bool>  	  p_out_ctrl_rsp; 
+				sc_out<uint32_t>  p_out_ctrl_data_0; 
 #endif
 
 
@@ -289,7 +291,6 @@ namespace caba{
 				// end TODO
 
 				// TODO : types temporaires a mettre dans le bon composant.
-				typedef enum {CTRL_NOP, CTRL_POISON_REQ, CTRL_UNPOISON_REQ, CTRL_UPDT_PT_F1_REQ, CTRL_UPDT_PT_F2_REQ } ctrl_in_cmd_t;
 				typedef enum {CTRL_VIRT_PP, CTRL_INV_OK } ctrl_out_cmd_t;
 		};  
 }}

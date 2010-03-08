@@ -35,6 +35,7 @@
 #include <iostream>
 #include "mcc_globals.h"
 
+#include "mig_control.h"
 
 namespace soclib {
 namespace caba {
@@ -53,33 +54,32 @@ namespace caba {
 			case RAM_WIAM_UPDT :
 			case RAM_UNPOISON :
 			case RAM_PAGE_TABLE_DIR_SAVE :
-			case RAM_PAGE_TABLE_DIR_UPDT :
 				// Ack for Ctrl request
 #ifndef NOCTRL
-				p_ctrl_out_data_0 = 0;
-				p_ctrl_out_cmd = CTRL_NOP;
-				p_ctrl_rsp = false;
-				p_ctrl_req_ack = true;
+				p_out_ctrl_data_0 = 0;
+				p_out_ctrl_cmd = MigControl::CTRL_IN_NOP;
+				p_out_ctrl_rsp = false;
+				p_out_ctrl_req_ack = true;
 #endif
 				break;
 
 			case RAM_TLB_INV_OK :
 				// send CTRL_INV_OK to ctrl module (ie. we received all the ACK's for the TLB invalidations) 
 #ifndef NOCTRL
-				p_ctrl_out_data_0 = 0;
-				p_ctrl_out_cmd = CTRL_INV_OK;
-				p_ctrl_rsp = true;
-				p_ctrl_req_ack = false;
+				p_out_ctrl_data_0 = 0;
+				p_out_ctrl_cmd = MigControl::CTRL_INV_OK;
+				p_out_ctrl_rsp = true;
+				p_out_ctrl_req_ack = false;
 #endif
 				break;
 
 			case RAM_POISON :
 				// Ack for Ctrl request AND send the virtual address of the page to be poisonned
 #ifndef NOCTRL
-				p_ctrl_out_data_0 = r_VIRT_POISON_PAGE.read();
-				p_ctrl_out_cmd = CTRL_VIRT_PP;
-				p_ctrl_rsp = true;
-				p_ctrl_req_ack = true;
+				p_out_ctrl_data_0 = r_VIRT_POISON_PAGE.read();
+				p_out_ctrl_cmd = MigControl::CTRL_VIRT_PP;
+				p_out_ctrl_rsp = true;
+				p_out_ctrl_req_ack = true;
 #endif
 				break;
 
@@ -88,10 +88,10 @@ namespace caba {
 				m_vci_fsm . genMoore();
 #endif
 #ifndef NOCTRL
-				p_ctrl_out_data_0 = 0;
-				p_ctrl_out_cmd = CTRL_NOP;
-				p_ctrl_rsp = false;
-				p_ctrl_req_ack = false;
+				p_out_ctrl_data_0 = 0;
+				p_out_ctrl_cmd = MigControl::CTRL_IN_NOP;
+				p_out_ctrl_rsp = false;
+				p_out_ctrl_req_ack = false;
 #endif
 				break;
 
@@ -102,13 +102,13 @@ namespace caba {
 			case RAM_DATA_INVAL :
 			case RAM_DATA_INVAL_WAIT :
 			case RAM_TLB_INVAL :
+			case RAM_PAGE_TABLE_DIR_UPDT :
 			case RAM_DIRUPD :
 #ifndef NOCTRL
-msldfj
-				p_ctrl_out_data_0 = 0;
-				p_ctrl_out_cmd = CTRL_NOP;
-				p_ctrl_rsp = false;
-				p_ctrl_req_ack = false;
+				p_out_ctrl_data_0 = 0;
+				p_out_ctrl_cmd = MigControl::CTRL_IN_NOP;
+				p_out_ctrl_rsp = false;
+				p_out_ctrl_req_ack = false;
 #endif
 				break;
 

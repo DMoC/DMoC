@@ -98,6 +98,8 @@ namespace caba {
 		c_manometer = new soclib::caba::Manometer(generated_name);
 		sprintf(generated_name,"%s.counters", (const char *)insname);
 		c_counters = new soclib::caba::Counters(generated_name, nb_p, m_segment_list -> begin () -> size() / PAGE_SIZE, m_segment_list -> begin() -> baseAddress() , PAGE_SIZE);
+		sprintf(generated_name,"%s.mig_control", (const char *)insname);
+		c_mig_control = new soclib::caba::MigControl(generated_name, nb_p);
 
 		// some checks, we use a 32bits Sram and for now we don't manage "address conversions". 
 		assert(vci_param::N == 32);
@@ -126,6 +128,17 @@ namespace caba {
 		c_core -> p_counters_page_sel(s_page_sel_core2counters);
 		c_core -> p_counters_node_id(s_node_id_core2counters);
 		c_core -> p_counters_cost(s_cost_core2counters);
+
+		c_core -> p_in_ctrl_req(s_req_mig_control2core);
+		c_core -> p_in_ctrl_cmd(s_cmd_mig_control2core);
+		c_core -> p_in_ctrl_data_0(s_data_0_mig_control2core);
+		c_core -> p_in_ctrl_data_1(s_data_1_mig_control2core);
+		c_core -> p_in_ctrl_rsp_ack(s_rsp_ack_mig_control2core);
+
+		c_core -> p_out_ctrl_req_ack(s_req_ack_core2mig_control);
+		c_core -> p_out_ctrl_cmd(s_cmd_core2mig_control);
+		c_core -> p_out_ctrl_rsp(s_rsp_core2mig_control);
+		c_core -> p_out_ctrl_data_0(s_data_0_core2mig_control);
 
 #ifndef DEBUG_SRAM
 		c_sram_32 -> p_bk_sel(s_bk_core2sram);

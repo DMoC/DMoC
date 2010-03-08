@@ -28,7 +28,6 @@
 
 #ifndef VCI_MCC_RAM_H
 #define VCI_MCC_RAM_H
-#define NOCTRL
 
 #include <inttypes.h>
 #include <systemc>
@@ -43,6 +42,7 @@
 #include "sram_param.h"
 #include "manometer.h"
 #include "counters.h"
+#include "mig_control.h"
 
 #include "mapping_table.h"
 #include "loader.h"
@@ -73,6 +73,7 @@ namespace caba{
 				soclib::caba::MccRamCore<vci_param,sram_param> * c_core;
 				soclib::caba::Manometer * c_manometer; // a manometer to detect contention
 				soclib::caba::Counters * c_counters;  // counters to compute page access
+				soclib::caba::MigControl * c_mig_control;  // Control module of migration process
 
 				soclib::common::Loader					m_loader;
 				soclib::common::MappingTable		m_MapTab;			
@@ -108,6 +109,27 @@ namespace caba{
 				sc_signal< sc_uint<32> >	s_cost_core2counters;
 
 				sc_signal< bool >	s_contention_counters2ctrl;
+
+				// Interconnection signals : c_core -> c_mig_control
+				// TODO : type harmonization
+
+				sc_signal<bool>       s_req_mig_control2core;
+				sc_signal<uint32_t>   s_cmd_mig_control2core;
+				sc_signal<uint32_t>   s_data_0_mig_control2core;
+				sc_signal<uint32_t>   s_data_1_mig_control2core;
+				sc_signal<bool>       s_rsp_ack_mig_control2core; 
+
+				// todo ? c'est quoi c'est signaux : todo , utiliser c'est signaux
+				// plutot que des vagues "poison_core_ok!"
+				sc_signal<bool>     s_req_ack_core2mig_control; 
+				sc_signal<uint32_t> s_cmd_core2mig_control;
+				sc_signal<bool>     s_rsp_core2mig_control; 
+				sc_signal<uint32_t> s_data_0_core2mig_control; 
+
+				// c_manometer -> c_mig_control
+				
+				// c_counters -> c_mig_control
+				// todo :-)
 
 				
 			

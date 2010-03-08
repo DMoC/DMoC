@@ -76,7 +76,6 @@ class Counters : public soclib::caba::BaseModule {
 		// test if every thing is working fine
 
 		// Control interface
-#define NO_CTRL
 #ifndef NO_CTRL
 		sc_in< bool >		p_req;	
 		sc_in< cter_cmd_t >	p_cmd;	

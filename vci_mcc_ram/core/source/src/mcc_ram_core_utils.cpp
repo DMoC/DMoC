@@ -86,7 +86,7 @@ namespace caba {
 	tmpl(bool)::is_busy(void)
 	{
 #ifndef NOCTRL
-		return (p_ctrl_req.read());
+		return (p_in_ctrl_req.read());
 #else
 #ifdef DEADLOCK_NACK_POLICY
 		return (r_RAM_FSM != RAM_IDLE);

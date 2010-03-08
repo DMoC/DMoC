@@ -148,6 +148,7 @@ namespace caba {
 		r_loc_node_count_cpt  = 0;
 		r_loc_location_found  = false;	
 		r_loc_my_pressure_is_lower  = false;	
+
 		r_updt_cycle_two      = false;
 		r_updt_local_update   = false;
 		r_updt_update_ok      = false;
