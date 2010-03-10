@@ -84,9 +84,6 @@ class Counters : public soclib::caba::BaseModule {
 		sc_out< bool >		p_ack;	
 		sc_out< bool >		p_valid;	
 		sc_out< counter_t >	p_output;	
-
-		// ?
-		sc_in< bool >		p_freeze;
 #endif
 		
 

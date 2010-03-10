@@ -49,7 +49,6 @@ namespace caba {
 		const unsigned int	p_in_node_id	= p_node_id.read();
 	
 #ifndef NO_CTRL
-		const bool			p_in_freeze		= p_freeze.read();
 		const bool			p_in_req		= p_req.read();
 		const cter_cmd_t	p_in_cmd		= p_cmd.read();
 		const unsigned int	p_in_page_id	= p_page_id.read();

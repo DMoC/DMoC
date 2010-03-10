@@ -113,6 +113,7 @@ namespace caba{
 				// Interconnection signals : c_core -> c_mig_control
 				// TODO : type harmonization
 
+#if 0
 				sc_signal<bool>       s_req_mig_control2core;
 				sc_signal<uint32_t>   s_cmd_mig_control2core;
 				sc_signal<uint32_t>   s_data_0_mig_control2core;
@@ -125,6 +126,7 @@ namespace caba{
 				sc_signal<uint32_t> s_cmd_core2mig_control;
 				sc_signal<bool>     s_rsp_core2mig_control; 
 				sc_signal<uint32_t> s_data_0_core2mig_control; 
+#endif
 
 				// c_manometer -> c_mig_control
 				

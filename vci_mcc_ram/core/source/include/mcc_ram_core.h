@@ -28,7 +28,7 @@
 
 #ifndef MCC_RAM_CORE_H
 #define MCC_RAM_CORE_H
-//#define NOCTRL
+#define NOCTRL
 
 #include <inttypes.h>
 #include <systemc>
@@ -126,7 +126,8 @@ namespace caba{
 				sc_out< sc_uint<32> >	p_counters_cost;    // TODO set types correctly
 
 				// Migration related ports
-#ifndef NO_CTRL
+#ifndef NOCTRL
+#if 0
 				sc_in<bool>   	  p_in_ctrl_req;
 				sc_in<uint32_t>   p_in_ctrl_cmd;
 				sc_in<uint32_t>   p_in_ctrl_data_0;
@@ -137,6 +138,7 @@ namespace caba{
 				sc_out<uint32_t>  p_out_ctrl_cmd;
 				sc_out<bool>  	  p_out_ctrl_rsp; 
 				sc_out<uint32_t>  p_out_ctrl_data_0; 
+#endif
 #endif
 
 

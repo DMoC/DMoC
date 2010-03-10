@@ -129,6 +129,7 @@ namespace caba {
 		c_core -> p_counters_node_id(s_node_id_core2counters);
 		c_core -> p_counters_cost(s_cost_core2counters);
 
+#if 0
 		c_core -> p_in_ctrl_req(s_req_mig_control2core);
 		c_core -> p_in_ctrl_cmd(s_cmd_mig_control2core);
 		c_core -> p_in_ctrl_data_0(s_data_0_mig_control2core);
@@ -139,6 +140,7 @@ namespace caba {
 		c_core -> p_out_ctrl_cmd(s_cmd_core2mig_control);
 		c_core -> p_out_ctrl_rsp(s_rsp_core2mig_control);
 		c_core -> p_out_ctrl_data_0(s_data_0_core2mig_control);
+#endif
 
 #ifndef DEBUG_SRAM
 		c_sram_32 -> p_bk_sel(s_bk_core2sram);
