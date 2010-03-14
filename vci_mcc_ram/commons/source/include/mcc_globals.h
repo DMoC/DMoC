@@ -17,7 +17,7 @@
 #define START_TRACE_CYCLE 0
 //#define DEBUG_M7
 //#define DEBUG_M10
-#define DEBUG_M10_LEVEL 2
+#define DEBUG_MIG_CONTROL_LEVEL 0
 //#define DEBUG_M9
 #define DEBUG_MANOMETER
 //#define DEBUG_RAM
@@ -44,7 +44,7 @@ const unsigned int PAGE_SIZE = 512;
 
 // Manometer
 #define SAT_TIME_SLOT 100000
-#define SAT_THRESHOLD (SAT_TIME_SLOT * 80 / 100)
+#define SAT_THRESHOLD (SAT_TIME_SLOT * 20 / 100)
 
 #define MAX_NODES 128
 #define MAX_PAGES 0x8000

@@ -141,6 +141,33 @@ namespace caba {
 		c_core -> p_out_ctrl_rsp(s_rsp_core2mig_control);
 		c_core -> p_out_ctrl_data_0(s_data_0_core2mig_control);
 #endif
+		c_mig_control -> p_clk(p_clk);
+		c_mig_control -> p_resetn(p_resetn);
+
+		c_mig_control -> p_in_manometer_contention(s_contention_manometer2x);
+		c_mig_control -> p_in_manometer_ack(s_ack_manometer2x);
+		c_mig_control -> p_in_manometer_valid(s_valid_manometer2x);
+		c_mig_control -> p_in_manometer_pressure(s_pressure_manometer2x);
+
+		c_mig_control -> p_out_manometer_req(s_req_x2manometer);
+		c_mig_control -> p_out_manometer_cmd(s_cmd_x2manometer);
+		c_mig_control -> p_out_manometer_contention_ack(s_contention_ack_x2manometer);
+
+// Temporary
+		c_mig_control -> p_in_mig_engine_ack(s_t0);
+		c_mig_control -> p_in_mig_engine_req(s_t1);
+		c_mig_control -> p_in_mig_engine_cmd(s_t2);
+
+
+		c_mig_control -> p_in_counters_contention(s_contention_counters2ctrl);
+
+		c_mig_control -> p_out_counters_req(s_req_ctrl2counters);
+		c_mig_control -> p_out_counters_cmd(s_cmd_ctrl2counters);
+		c_mig_control -> p_out_counters_page_id(s_pid_ctrl2counters);
+
+		c_mig_control -> p_in_counters_ack(s_ack_counters2ctrl);
+		c_mig_control -> p_in_counters_valid(s_valid_counters2ctrl);
+		c_mig_control -> p_in_counters_output(s_output_counters2ctrl);
 
 #ifndef DEBUG_SRAM
 		c_sram_32 -> p_bk_sel(s_bk_core2sram);
@@ -176,15 +203,12 @@ namespace caba {
 
 		c_counters -> p_contention(s_contention_counters2ctrl);	
 
-#if 0 // TODO
-		c_counters -> p_req;	
-		c_counters -> p_cmd;	
-		c_counters -> p_page_id;	
-		c_counters -> p_ack;	
-		c_counters -> p_valid;	
-		c_counters -> p_freeze;
-		c_counters -> p_outpu;
-#endif
+		c_counters -> p_req(s_req_ctrl2counters);
+		c_counters -> p_cmd(s_cmd_ctrl2counters);
+		c_counters -> p_page_id(s_pid_ctrl2counters);
+		c_counters -> p_ack(s_ack_counters2ctrl);	
+		c_counters -> p_valid(s_valid_counters2ctrl);
+		c_counters -> p_output(s_output_counters2ctrl);
 
 
 		SC_METHOD (Transition);
@@ -199,6 +223,7 @@ namespace caba {
 		delete c_manometer;
 		delete c_counters;
 		delete m_segment_list;
+		delete c_mig_control;
 	};
 
 }}

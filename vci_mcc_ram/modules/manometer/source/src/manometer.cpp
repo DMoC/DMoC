@@ -117,8 +117,12 @@ namespace caba {
 #ifndef QUICK_RAISE
 				if (p_contention_ack.read())
 				{
-					DCOUT << name() << " ---> raised contention at p= " << dec << r_pressure << endl; 
+					DCOUT << name() << " ---> ack of raised  contention at p= " << dec << r_pressure << endl; 
 					r_MNTER_FSM = MNTER_IDLE;
+				}
+				else
+				{
+					DCOUT << name() << " Waiting for ACK! " << dec << r_pressure << endl; 
 				}
 #else
 				// Idea : don't wait for acknowlegde, the contention signal is up for only
@@ -144,7 +148,7 @@ namespace caba {
 				m_cycles = 0;
 				if (r_nb_request.read() > SAT_THRESHOLD) // raise contention
 				{
-					//	r_MNTER_FSM = MNTER_CONTENTION;
+					r_MNTER_FSM = MNTER_CONTENTION;
 					DCOUT << name() << " contention detected  pressure : "<< std::dec << r_nb_request.read()  << std::endl;
 					DCOUT << name() << " SAT_THRESHOLD is : "<< std::dec << (SAT_THRESHOLD) << std::endl;
 				}

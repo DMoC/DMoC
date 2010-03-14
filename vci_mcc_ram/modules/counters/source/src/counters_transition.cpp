@@ -73,6 +73,7 @@ namespace caba {
 			r_index_p = 0;
 			r_raise_threshold = false;
 			m_raise_threshold = false;
+			std::cout << name() <<  "counters raise contention!" << std::endl;
 			r_CTER_FSM = CTER_IDLE;
 			D_COUNTERS_COUT << " reset done  " << endl;
 			return;

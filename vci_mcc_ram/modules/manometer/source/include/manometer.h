@@ -33,6 +33,7 @@
 #include "caba_base_module.h"
 #include <fstream>
 
+#define DEBUG_MANOMETER
 #ifdef DEBUG_MANOMETER
 	#define DCOUT cout
 #else
@@ -52,6 +53,7 @@ class Manometer : public soclib::caba::BaseModule {
 		typedef sc_uint< 32 > mnter_pressure_t;
 		enum mnter_cmd_types_e
 		{
+			MNTER_CMD_NOP,
 			MNTER_CMD_READ,
 			MNTER_CMD_RESET
 		};

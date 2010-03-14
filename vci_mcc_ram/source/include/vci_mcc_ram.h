@@ -102,6 +102,11 @@ namespace caba{
 				sc_signal<bool>	s_ack_manometer2x;
 				sc_signal< Manometer::mnter_pressure_t>	s_pressure_manometer2x;
 
+				// temp : 
+				sc_signal<bool>	s_t0;
+				sc_signal<bool>	s_t1;
+				sc_signal< MigControl::m6_cmd_t >	s_t2;
+
 				// Interconnection signals : c_core -> c_counters
 				sc_signal< bool >			s_enable_core2counters;
 				sc_signal< sc_uint<32> >	s_page_sel_core2counters;
@@ -111,6 +116,14 @@ namespace caba{
 				sc_signal< bool >	s_contention_counters2ctrl;
 
 				// Interconnection signals : c_core -> c_mig_control
+				sc_signal < bool > s_req_ctrl2counters;
+				sc_signal < Counters::cter_cmd_t > s_cmd_ctrl2counters;
+				sc_signal < sc_uint < 32 > > s_pid_ctrl2counters;
+
+				sc_signal < bool > s_ack_counters2ctrl;
+				sc_signal < bool > s_valid_counters2ctrl;
+				sc_signal < counter_t > s_output_counters2ctrl;
+		
 				// TODO : type harmonization
 
 #if 0
