@@ -88,7 +88,6 @@ namespace caba{
 				std::list<soclib::common::Segment>					* m_segment_list;    // A segment list 
 
 
-			public :
 				SRam (
 						sc_module_name insname,
 						std::list<soclib::common::Segment> * seg_list,

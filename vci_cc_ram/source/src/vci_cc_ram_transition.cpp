@@ -43,10 +43,6 @@ namespace caba {
 	/////////////////////////////////////////////////////
 	tmpl(void)::Transition()
 	{
-		s_t1 = c_sram_32->read_write_sram(2, 0x9829, 0, false, true, 0xf);
-		s_t2 = c_sram_32->read_write_sram(2, 0x9a39, 0, false, true, 0xf);
-		s_t3 = c_sram_32->read_write_sram(2, 0x9c49, 0, false, true, 0xf);
-		s_t4 = c_sram_32->read_write_sram(2, 0x9e59, 0, false, true, 0xf);
 
 		if (!p_resetn.read()) // Reset_N signal
 		{
