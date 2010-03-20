@@ -1,0 +1,15 @@
+
+# -*- python -*-
+
+Module('caba:mcc_ram_manometer',
+	classname = 'soclib::caba::Manometer',
+	header_files = ['../source/include/manometer.h',],
+	implementation_files = ['../source/src/manometer.cpp',],
+	instance_parameters  = [
+	parameter.Int('threshold'),
+	],
+	uses = [
+		Uses('caba:mcc_globals_sls'),
+		Uses('caba:base_module'),
+	],
+)

@@ -44,25 +44,9 @@ tmpl(void)::transition()
 
 	m_iss.getRequests( icache_req_port, dcache_req_port );
 
-	// Instruction cache requests
-	const typename vci_param::addr_t		icache_address = icache_req_port.addr;
-	const unsigned int	icache_y = m_i_y[icache_address];
-	const unsigned int	icache_x = m_i_x[icache_address];
-	const typename vci_param::addr_t		icache_z = m_i_z[icache_address] | V_BIT;
-	const bool		icache_hit = (icache_z == s_ICACHE_TAG[icache_y].read());
-	const bool		icache_req = icache_req_port.valid;
-
-
 	// Data cache requests
 	const typename vci_param::addr_t		dcache_address  = dcache_req_port.addr;
 	const typename vci_param::data_t		dcache_wdata  = dcache_req_port.wdata;
-	const unsigned int	dcache_x = m_d_x[dcache_address];
-	const unsigned int	dcache_y = m_d_y[dcache_address];
-	const typename vci_param::addr_t		dcache_z = m_d_z[dcache_address] | V_BIT;
-	const bool		dcache_hit = (dcache_z == s_DCACHE_TAG[dcache_y].read());
-	const bool		dcache_req = dcache_req_port.valid;
-	const typename iss_t::be_t dcache_be = dcache_req_port.be;
-	const int dcache_type = dcache_req_port.type;
 
 	// Invalidations
 	const typename vci_param::addr_t		dcache_inv_address = r_RAM_INV_ADDR;
@@ -140,19 +124,35 @@ tmpl(void)::transition()
 			break;
 
 		case ICACHE_IDLE :
-			if (!icache_req) break; // nothing to do
-			if (icache_hit) // the common case, return the instruction in the SAME cycle,
-											// this is the case beacause m_iss.executeNCycles is called AFTER 
-											// setting the values hereafter (.valid, and .instruction).
 			{
-				icache_rsp_port.valid          = icache_hit;
-				icache_rsp_port.instruction    = s_ICACHE_DATA[icache_y][icache_x].read();
-			}
-			else // miss, issue a miss request and wait for the response
-			{
-				r_ICACHE_MISS_ADDR_SAVE = icache_address;
-				r_ICACHE_FSM = ICACHE_WAIT;
-				r_ICACHE_MISS_REQ = true;
+				// Instruction cache requests
+				typename vci_param::addr_t		icache_address = icache_req_port.addr;
+				unsigned int	icache_y = m_i_y[icache_address];
+				unsigned int	icache_x = m_i_x[icache_address];
+				typename vci_param::addr_t		icache_z = m_i_z[icache_address] | V_BIT;
+				bool		icache_hit = (icache_z == s_ICACHE_TAG[icache_y].read());
+				bool		icache_req = icache_req_port.valid;
+
+				if (!icache_req) break; // nothing to do
+				if (icache_hit) // the common case, return the instruction in the SAME cycle,
+					// this is the case beacause m_iss.executeNCycles is called AFTER 
+					// setting the values hereafter (.valid, and .instruction).
+					{
+						assert(icache_req);
+						icache_rsp_port.valid          = icache_hit;
+						icache_rsp_port.instruction    = s_ICACHE_DATA[icache_y][icache_x].read();
+						if ((s_ICACHE_DATA[icache_y][icache_x].read() == 0xFEED0BAD))
+						{
+							std::cout << name() << "WARNING : processor reads an instruction  that it was probably not initialized," << std::endl;
+							std::cout << name() << "          it contained the magic 0xFEED0BAD set at allocation time of S-ram memory." << std::endl;
+						}
+					}
+				else // miss, issue a miss request and wait for the response
+				{
+					r_ICACHE_MISS_ADDR_SAVE = icache_address;
+					r_ICACHE_FSM = ICACHE_WAIT;
+					r_ICACHE_MISS_REQ = true;
+				}
 			}
 			break;
 
@@ -164,12 +164,17 @@ tmpl(void)::transition()
 			break;
 
 		case ICACHE_UPDT :
-			s_ICACHE_TAG[icache_y] = icache_z;
-			for (size_t i=0 ; i<s_icache_words ; i++) // Fill up the memory line
 			{
-				s_ICACHE_DATA[icache_y][i] = r_RSP_ICACHE_MISS_BUF[i];
+				unsigned int	icache_y = m_i_y[r_ICACHE_MISS_ADDR_SAVE.read()];
+				typename vci_param::addr_t		icache_z = m_i_z[r_ICACHE_MISS_ADDR_SAVE.read()] | V_BIT;
+
+				s_ICACHE_TAG[icache_y] = icache_z;
+				for (size_t i=0 ; i<s_icache_words ; i++) // Fill up the memory line
+				{
+					s_ICACHE_DATA[icache_y][i] = r_RSP_ICACHE_MISS_BUF[i];
+				}
+				r_ICACHE_FSM = ICACHE_IDLE; // Go to idle, the next cycle the request will hit in cache 
 			}
-			r_ICACHE_FSM = ICACHE_IDLE; // Go to idle, the next cycle the request will hit in cache 
 			break;
 
 		default : // an impossible case
@@ -216,6 +221,17 @@ tmpl(void)::transition()
 
 		case DCACHE_IDLE : 
 			{
+				// Data cache requests
+				typename vci_param::addr_t		dcache_address  = dcache_req_port.addr;
+				typename vci_param::data_t		dcache_wdata  = dcache_req_port.wdata;
+				unsigned int	dcache_x = m_d_x[dcache_address];
+				unsigned int	dcache_y = m_d_y[dcache_address];
+				typename vci_param::addr_t		dcache_z = m_d_z[dcache_address] | V_BIT;
+				bool		dcache_hit = (dcache_z == s_DCACHE_TAG[dcache_y].read());
+				bool		dcache_req = dcache_req_port.valid;
+				typename iss_t::be_t dcache_be = dcache_req_port.be;
+				int dcache_type = dcache_req_port.type;
+
 				bool dr_cached;
 				bool dr_ll = false;
 				bool dr_sc = false;
@@ -292,7 +308,7 @@ tmpl(void)::transition()
 					{
 						if (((dcache_address & m_dcache_zmask) == r_DCACHE_ENQUEUED_ADDR_SAVE.read()) // Address of a byte in the same address word
 								&& (dcache_type == iss_t::DATA_WRITE )
-								&& (ffs(dcache_be) == (soclib::common::fls(r_DCACHE_WL_BE_SAVE.read()) + 1))) // consecutive be's  
+								&& (ffs((uint32_t)dcache_be) == (soclib::common::fls((uint32_t)r_DCACHE_WL_BE_SAVE.read()) + 1))) // consecutive be's  
 							// merge the next data in the same cell
 						{
 							// update DATA_FIFO_INPUT and current be (DCACHE_WL_BE_SAVE)
@@ -342,6 +358,11 @@ tmpl(void)::transition()
 									r_DCACHE_FSM = DCACHE_IDLE;
 									dcache_rsp_port.valid = true;
 									dcache_rsp_port.rdata = s_DCACHE_DATA[dcache_y][dcache_x].read();
+									if((s_DCACHE_DATA[dcache_y][dcache_x].read() == 0xFEED0BAD))
+									{
+											std::cout << name() << "WARNING : processor reads a data that it was probably not initialized," << std::endl;
+											std::cout << name() << "          it contained the magic 0xFEED0BAD set at allocation time of S-ram memory." << std::endl;
+									}
 								}
 							}
 							else // Issue an unached request to memory
@@ -449,6 +470,11 @@ tmpl(void)::transition()
 				}
 				dcache_rsp_port.valid = true;
 				dcache_rsp_port.rdata = r_RSP_DCACHE_MISS_BUF[x].read();
+				if((r_RSP_DCACHE_MISS_BUF[x].read() == 0xFEED0BAD))
+				{
+					std::cout << name() << "WARNING : processor reads a data that it was probably not initialized," << std::endl;
+					std::cout << name() << "          it contained the magic 0xFEED0BAD set at allocation time of S-ram memory." << std::endl;
+				}
 				r_DCACHE_FSM = DCACHE_IDLE;
 				break;
 			}
@@ -471,15 +497,19 @@ tmpl(void)::transition()
 
 				dcache_rsp_port.valid = true;
 				dcache_rsp_port.rdata = r_RSP_DCACHE_UNC_BUF.read();
+				if ((r_RSP_DCACHE_UNC_BUF.read() == 0xFEED0BAD))
+				{
+					std::cout << name() << "WARNING : processor reads a data (unc, ll or sc)  that it was probably not initialized," << std::endl;
+					std::cout << name() << "          it contained the magic 0xFEED0BAD set at allocation time of S-ram memory." << std::endl;
+				}
 				r_DCACHE_FSM = DCACHE_IDLE;
 
 				break;
 			}
 
 		case DCACHE_CPUINVAL :
-			{	// TODO : check this
-				assert(false); // error r_REQ_DCACHE_ADDR_VIRT is not the good address!
-				const int y = m_d_y[r_REQ_DCACHE_ADDR_VIRT.read()];
+			{
+				const int y = m_d_y[r_DCACHE_ADDR_SAVE.read()];
 				s_DCACHE_TAG[y] = 0;
 				r_DCACHE_FSM = DCACHE_IDLE;     
 				break; 
@@ -508,7 +538,9 @@ tmpl(void)::transition()
 		uint32_t it = 0;
 		for (size_t i=0; i<(size_t)iss_t::n_irq; i++)
 		{
-			if(p_irq[i].read()) { it |= (1<<i); }
+			if(p_irq[i].read()) {
+				it |= (1<<i);
+			}
 		}
 		m_iss.executeNCycles(1, icache_rsp_port, dcache_rsp_port, it);
 	}
@@ -980,7 +1012,7 @@ tmpl(void)::transition()
 						std::cout << " 		eop      : 0x" << std::hex << (int)p_t_vci.eop.read() << std::endl;
 						std::cout << " 		srcid    : " << std::hex << (int)p_t_vci.srcid.read() << std::endl;
 						std::cout << " 		ncycles  : " << std::hex <<  ncycles << std::endl;
-						raise(SIGINT);
+						sc_stop();
 						return;
 					}
 					assert(dr_inv_command == vci_param::CMD_WRITE);    // invalidations are coded as write commands

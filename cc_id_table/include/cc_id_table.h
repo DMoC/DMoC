@@ -68,7 +68,6 @@ public :
     CcIdTable(void);
     ~CcIdTable(void);
 private :
-    CcIdTable * unique_ref;
     std::map<unsigned int , soclib::common::IntTab > * relation_cc_id_target_map;
     std::map<unsigned int ,unsigned int > * relation_srcid_id_map;
 		int coherent_id;

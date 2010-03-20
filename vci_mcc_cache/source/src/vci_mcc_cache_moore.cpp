@@ -88,8 +88,10 @@ const unsigned int dec = r_REQ_DCACHE_ADDR_PHYS.read() & 0x3;
 		case REQ_UNC :
 			p_i_vci.cmdval = true;
 			p_i_vci.address = (r_REQ_DCACHE_ADDR_PHYS.read() & (~0x3));
-			p_i_vci.plen = soclib::common::fls(r_DCACHE_BE_SAVE.read())-ffs(r_DCACHE_BE_SAVE.read())+1;
-			assert((soclib::common::fls(r_DCACHE_BE_SAVE.read())-ffs(r_DCACHE_BE_SAVE.read())+1) != 0);
+
+			p_i_vci.plen = soclib::common::fls((uint32_t)r_DCACHE_BE_SAVE.read())-ffs((uint32_t)r_DCACHE_BE_SAVE.read())+1;
+			assert((soclib::common::fls((uint32_t)r_DCACHE_BE_SAVE.read())-ffs((uint32_t)r_DCACHE_BE_SAVE.read())+1 ) <= vci_param::B);
+			assert((soclib::common::fls((uint32_t)r_DCACHE_BE_SAVE.read())-ffs((uint32_t)r_DCACHE_BE_SAVE.read())+1) != 0);
 			p_i_vci.cmd    = r_DCACHE_LL_SAVE.read() ? vci_param::CMD_LOCKED_READ : vci_param::CMD_READ;
 			p_i_vci.be     = r_DCACHE_BE_SAVE.read();
 			p_i_vci.trdid  = 0;
@@ -127,7 +129,10 @@ const unsigned int dec = r_REQ_DCACHE_ADDR_PHYS.read() & 0x3;
 			p_i_vci.address = (r_REQ_DCACHE_ADDR_PHYS.read() & (~0x3));
 			p_i_vci.wdata   = r_REQ_DCACHE_DATA.read() << dec*8;
 			p_i_vci.be     = r_DCACHE_WF_BE_SAVE.read();
-			p_i_vci.plen = (vci_param::B * r_WRITE_BURST_SIZE.read()) - (vci_param::B - soclib::common::fls(r_DCACHE_WF_BE_SAVE.read()))  - soclib::common::ctz((typename vci_param::be_t)r_DCACHE_WL_BE_SAVE.read());
+			p_i_vci.plen = (vci_param::B * r_WRITE_BURST_SIZE.read()) - 
+										(vci_param::B - soclib::common::fls((uint32_t)r_DCACHE_WF_BE_SAVE.read())) -
+										soclib::common::ctz((uint32_t)r_DCACHE_WL_BE_SAVE.read());
+
 			p_i_vci.cmd    = vci_param::CMD_WRITE;
 			p_i_vci.trdid  = 0;
 			p_i_vci.pktid  = (r_REQ_DCACHE_ADDR_VIRT.read() >> m_PAGE_SHIFT);

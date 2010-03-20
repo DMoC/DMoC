@@ -17,9 +17,9 @@
 #define START_TRACE_CYCLE 0
 //#define DEBUG_M7
 //#define DEBUG_M10
-#define DEBUG_M10_LEVEL 2
+#define DEBUG_MIG_CONTROL_LEVEL 0
 //#define DEBUG_M9
-//#define DEBUG_M8
+#define DEBUG_MANOMETER
 //#define DEBUG_RAM
 #define DEBUG_RAM_LEVEL 3
 #define DEBUG_CACHE
@@ -42,12 +42,15 @@ const unsigned int TLB_SIZE = 8;
 const unsigned int PAGE_SIZE = 512;
 #endif
 
+// Manometer
+#define SAT_TIME_SLOT 100000
+#define SAT_THRESHOLD (SAT_TIME_SLOT * 20 / 100)
+
 #define MAX_NODES 128
 #define MAX_PAGES 0x8000
 
 // Module_9
-typedef unsigned int counter_t;
-typedef int counter_id_t;
+#define CPT_TIME 3
 
 #define NBIT_ORDER 1
 
@@ -73,12 +76,6 @@ typedef int counter_id_t;
 // Module_8
 
 
-// SAT_THRESHOLD : 80% of how many requests per SAT_TIME_SLOT period can
-// process the memory module (in our case, 1 request => 11 cycles (8 words line)
-//#define SAT_THRESHOLD 877
-//#define THRES_P
-#define SAT_THRESHOLD 100000
-#define SAT_TIME_SLOT 10000000 
 
 #define CONTENTION_THRESHOLD 3
 // Module_6

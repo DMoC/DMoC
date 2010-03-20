@@ -28,7 +28,6 @@
 
 #ifndef VCI_MCC_RAM_H
 #define VCI_MCC_RAM_H
-#define NOCTRL
 
 #include <inttypes.h>
 #include <systemc>
@@ -41,6 +40,9 @@
 #include "mcc_ram_core.h"
 #include "sram.h"
 #include "sram_param.h"
+#include "manometer.h"
+#include "counters.h"
+#include "mig_control.h"
 
 #include "mapping_table.h"
 #include "loader.h"
@@ -69,6 +71,9 @@ namespace caba{
 				soclib::caba::SRam<sram_param> * c_sram_32; // 32bits Sram
 #endif
 				soclib::caba::MccRamCore<vci_param,sram_param> * c_core;
+				soclib::caba::Manometer * c_manometer; // a manometer to detect contention
+				soclib::caba::Counters * c_counters;  // counters to compute page access
+				soclib::caba::MigControl * c_mig_control;  // Control module of migration process
 
 				soclib::common::Loader					m_loader;
 				soclib::common::MappingTable		m_MapTab;			
@@ -84,6 +89,64 @@ namespace caba{
 				sc_signal<typename sram_param::data_t>   s_din_core2sram;
 				sc_signal<typename sram_param::data_t>   s_dout_core2sram;
 				sc_signal<bool>   s_ack_core2sram;
+
+				// Interconnection signals : c_core -> c_manometer
+				sc_signal<bool>	s_core_req_core2manometer;
+				
+				sc_signal<bool>	s_contention_ack_x2manometer;
+				sc_signal< Manometer::mnter_cmd_t >	s_cmd_x2manometer;
+				sc_signal<bool>	s_req_x2manometer;
+
+				sc_signal<bool>	s_valid_manometer2x;
+				sc_signal<bool>	s_contention_manometer2x;
+				sc_signal<bool>	s_ack_manometer2x;
+				sc_signal< Manometer::mnter_pressure_t>	s_pressure_manometer2x;
+
+				// temp : 
+				sc_signal<bool>	s_t0;
+				sc_signal<bool>	s_t1;
+				sc_signal< MigControl::m6_cmd_t >	s_t2;
+
+				// Interconnection signals : c_core -> c_counters
+				sc_signal< bool >			s_enable_core2counters;
+				sc_signal< sc_uint<32> >	s_page_sel_core2counters;
+				sc_signal< sc_uint<32> >	s_node_id_core2counters;
+				sc_signal< sc_uint<32> >	s_cost_core2counters;
+
+				sc_signal< bool >	s_contention_counters2ctrl;
+
+				// Interconnection signals : c_core -> c_mig_control
+				sc_signal < bool > s_req_ctrl2counters;
+				sc_signal < Counters::cter_cmd_t > s_cmd_ctrl2counters;
+				sc_signal < sc_uint < 32 > > s_pid_ctrl2counters;
+				sc_signal < sc_uint < 32 > > s_nid_ctrl2counters;
+
+				sc_signal < bool > s_ack_counters2ctrl;
+				sc_signal < bool > s_valid_counters2ctrl;
+				sc_signal < sc_uint < 32 > > s_output_counters2ctrl;
+		
+				// TODO : type harmonization
+
+#if 0
+				sc_signal<bool>       s_req_mig_control2core;
+				sc_signal<uint32_t>   s_cmd_mig_control2core;
+				sc_signal<uint32_t>   s_data_0_mig_control2core;
+				sc_signal<uint32_t>   s_data_1_mig_control2core;
+				sc_signal<bool>       s_rsp_ack_mig_control2core; 
+
+				// todo ? c'est quoi c'est signaux : todo , utiliser c'est signaux
+				// plutot que des vagues "poison_core_ok!"
+				sc_signal<bool>     s_req_ack_core2mig_control; 
+				sc_signal<uint32_t> s_cmd_core2mig_control;
+				sc_signal<bool>     s_rsp_core2mig_control; 
+				sc_signal<uint32_t> s_data_0_core2mig_control; 
+#endif
+
+				// c_manometer -> c_mig_control
+				
+				// c_counters -> c_mig_control
+				// todo :-)
+
 				
 			
 
@@ -108,7 +171,7 @@ namespace caba{
 						addr_to_homeid_entry_t * home_addr_table,		// Used to convert node_id <-> memory_segment_base_address
 						unsigned int nb_m,													// Number of memory nodes (used in migration)
 						const soclib::common::MappingTable * mt,			// Mapping Table for read/write requets
-						const soclib::common::MappingTable * mt_inv  // Mapping Table for invalidation requests (alternative NoC). 
+						const soclib::common::MappingTable * mt_inv = NULL // Mapping Table for invalidation requests (alternative NoC). 
 						);
 
 				~VciMccRam();  

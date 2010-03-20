@@ -95,8 +95,16 @@ namespace caba {
 		m_nbcycles = 0;
 		m_last_write_nack = false;
 
-		CTOR_OUT
+		m_sram_oe = false;
+		m_sram_we = false;
+		m_sram_ce = false;
 
+        m_counters_enable	= false;
+        m_counters_page_sel = 0;
+        m_counters_node_id	= 0;
+        m_counters_cost		= 0;
+		
+		CTOR_OUT
 
 		m_vci_fsm.on_read_write_nlock_tlb(on_read, on_write);
 		m_vci_fsm.on_tlb_miss_ack_nlock_tlb(on_tlb_miss, on_tlb_ack);
@@ -113,6 +121,8 @@ namespace caba {
 #ifndef DEBUG_SRAM
 		SC_METHOD (genMealy);
 		sensitive << p_sram_ack;
+		sensitive << p_sram_din;
+		sensitive_neg << p_clk;
 		dont_initialize();
 #endif
 

@@ -1,0 +1,17 @@
+
+# -*- python -*-
+
+Module('caba:mcc_ram_counters',
+	classname = 'soclib::caba::Counters',
+	header_files = ['../source/include/counters.h'],
+	implementation_files = [
+		'../source/src/counters.cpp',
+		'../source/src/counters_transition.cpp',
+		'../source/src/counters_genmoore.cpp',
+		'../source/src/counters_utils.cpp',
+	],
+	uses = [
+		Uses('caba:mcc_globals_sls'),
+		Uses('caba:base_module'),
+	],
+)

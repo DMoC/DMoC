@@ -1,5 +1,4 @@
 /* -*- c++ -*-
- *
  * SOCLIB_LGPL_HEADER_BEGIN
  * 
  * This file is part of SoCLib, GNU LGPLv2.1.
@@ -21,31 +20,28 @@
  * SOCLIB_LGPL_HEADER_END
  *
  * Copyright (c) TIMA
- * 	   Pierre Guironnet de Massas <pierre.guironnet-de-massas@imag.fr>, 2006-2008
+ * 	Pierre Guironnet de Massas <pierre.guironnet-de-massas@imag.fr>, 2008
  *
- * Maintainers: Pierre Guironnet de Massas
  */
 
-#include "vci_mcc_cache.h"
 
-#define tmpl(x)  template<typename vci_param, typename iss_t> x VciMccCache<vci_param, iss_t>
-namespace soclib { 
-namespace caba {
 
-tmpl(typename vci_param::data_t)::be_to_mask(typename iss_t::be_t be)
-{
-    int i;
-    typename vci_param::data_t ret = 0;
-    const typename iss_t::be_t be_up = (1<<(vci_param::B -1));
+#include <cassert>
+#include <iostream>
+#include "mig_control.h"
+#include "arithmetics.h"
+#include "mcc_globals.h"
 
-    for (i=0 ; i < vci_param::B ; ++i)
+namespace soclib {
+	namespace caba {
+
+		using namespace soclib;
+		using namespace std;
+		using soclib::common::uint32_log2;
+
+		const string & MigControl::name()
 		{
-        ret <<= 8;
-        if ( be_up & be )
-            ret |= 0xff;
-        be <<= 1;
-    }
-    return ret;
-}
-
+	mlksdf
+			return this->getName();
+		}
 }}

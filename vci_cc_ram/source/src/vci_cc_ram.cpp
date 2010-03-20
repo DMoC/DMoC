@@ -34,6 +34,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <cstdio>
 
 
 namespace soclib {
@@ -61,18 +62,22 @@ namespace caba {
 		m_MapTab(*mt)
 	{
 
+		char generated_name[32];
+		sprintf(generated_name,"%s.core",(const char *)insname);
 		m_segment_list = new std::list<soclib::common::Segment>(mt -> getSegmentList(t_ident));
 
 		// Instanciate sub_modules
 		if (mt_inv == NULL) // Only one NoC for requests and invalidation, pass &mt instead of &mt_inv as "Mapping table for invalidations"
 		{
-			c_core = new soclib::caba::CcRamCore<vci_param,sram_param>("c_core",i_ident,t_ident,mt,mt,cct,nb_p,line_size);
+			c_core = new soclib::caba::CcRamCore<vci_param,sram_param>(generated_name,i_ident,t_ident,mt,mt,cct,nb_p,line_size);
 		}
 		else
 		{
-			c_core = new soclib::caba::CcRamCore<vci_param,sram_param>("c_core",i_ident,t_ident,mt,mt_inv,cct,nb_p,line_size);
+			c_core = new soclib::caba::CcRamCore<vci_param,sram_param>(generated_name,i_ident,t_ident,mt,mt_inv,cct,nb_p,line_size);
 		}
-		c_sram_32 = new soclib::caba::SRam<sram_param>("c_sram", m_segment_list, loader);
+
+		sprintf(generated_name,"%s.sram",(const char *)insname);
+		c_sram_32 = new soclib::caba::SRam<sram_param>(generated_name, m_segment_list, loader);
 
 		// some checks, we use a 32bits Sram and for now we don't manage "address conversions". 
 		assert(vci_param::N == 32);

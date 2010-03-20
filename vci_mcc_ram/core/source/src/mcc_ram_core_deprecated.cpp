@@ -92,12 +92,15 @@ namespace caba {
 
 	tmpl(bool)::is_access_sram_possible(void){
 		assert(false); // Todo : outdated, should be done with a real interface (sc_in/out).
+		return false;
 	}
 
 	tmpl(unsigned int)::read_seg(unsigned int page_index,unsigned int word_page_offset){
 		assert(false); // Todo : outdated, should be done with a real interface (sc_in/out).
 #if 0
 		return  rw_seg(s_RAM, (((page_index << m_PAGE_SHIFT) >> m_ADDR_WORD_SHIFT) + word_page_offset), 0, 0, vci_param::CMD_READ);
+#else
+		return 0;
 #endif
 	}
 

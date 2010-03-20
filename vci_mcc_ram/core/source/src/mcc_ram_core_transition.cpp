@@ -143,40 +143,41 @@ namespace caba {
 						// If there is no vci request to process, or being processed, check for external
 						// modules requests. 
 				#ifndef NOCTRL
-						if (!r_IN_TRANSACTION.read() && p_ctrl_req.read())
+						if (!r_IN_TRANSACTION.read() && p_in_ctrl_req.read())
 						{
 							DRAMCOUT(3) << name() << "[CTRL REQUEST]  " << std::endl;
-							DRAMCOUT(3) << name() << "> CMD   "     << std::hex << p_ctrl_in_cmd.read() << std::endl;
-							DRAMCOUT(3) << name() << "> DATA_F1   " << std::hex << p_ctrl_in_data_0.read() << std::endl;
-							DRAMCOUT(3) << name() << "> DATA_F2   " << std::hex << p_ctrl_in_data_1.read() << std::endl;
+							DRAMCOUT(3) << name() << "> CMD   "     << std::hex << p_in_ctrl_cmd.read() << std::endl;
+							DRAMCOUT(3) << name() << "> DATA_F1   " << std::hex << p_in_ctrl_data_0.read() << std::endl;
+							DRAMCOUT(3) << name() << "> DATA_F2   " << std::hex << p_in_ctrl_data_1.read() << std::endl;
 
-							switch(p_ctrl_in_cmd.read())
+							switch(p_in_ctrl_cmd.read())
 							{
+								assert(false);
 								// TODO : acquiter la requête dans le moore de l'état atteint !
 								// r_PAGE_TO_POISON devrait être plutot une adresse pour "unifier" la com.
-								case CTRL_POISON_REQ :
-									m_vci_fsm.break_link(p_ctrl_in_data_0.read());
-									r_TARGET_PAGE_ADDR  = p_ctrl_in_data_0.read();
-									r_VIRT_POISON_PAGE = s_PAGE_TABLE -> wiam(p_ctrl_in_data_0.read() << m_PAGE_SHIFT); 
-									assert(p_ctrl_rsp_ack.read());
+								case MigControl::CTRL_POISON_REQ :
+									m_vci_fsm.break_link(p_in_ctrl_data_0.read());
+									r_TARGET_PAGE_ADDR  = p_in_ctrl_data_0.read();
+									r_VIRT_POISON_PAGE = s_PAGE_TABLE -> wiam(p_in_ctrl_data_0.read() << m_PAGE_SHIFT); 
+									assert(p_in_ctrl_rsp_ack.read());
 									r_RAM_FSM = RAM_POISON;
 									break;
 
-								case CTRL_UNPOISON_REQ :
-									r_TARGET_PAGE_ADDR = p_ctrl_in_data_0.read(); 
+								case MigControl::CTRL_UNPOISON_REQ :
+									r_TARGET_PAGE_ADDR = p_in_ctrl_data_0.read(); 
 									r_RAM_FSM = RAM_UNPOISON;
 									break;
 
-								case CTRL_UPDT_PT_F1_REQ :
+								case MigControl::CTRL_UPDT_PT_F1_REQ :
 									if (r_PROCESSING_TLB_INV.read()) break; // Avoid overwritting some registers (r_INV_BLOCKADRESS for example)
-									r_TARGET_PAGE_ADDR = p_ctrl_in_data_0.read(); 
-									r_NEW_PAGE_ADDR = p_ctrl_in_data_1.read();
+									r_TARGET_PAGE_ADDR = p_in_ctrl_data_0.read(); 
+									r_NEW_PAGE_ADDR = p_in_ctrl_data_1.read();
 									r_RAM_FSM = RAM_PAGE_TABLE_DIR_SAVE;
 									break;
 
-								case CTRL_UPDT_PT_F2_REQ :
-									r_TARGET_PAGE_ADDR = p_ctrl_in_data_0.read(); 
-									r_NEW_PAGE_ADDR = p_ctrl_in_data_1.read();
+								case MigControl::CTRL_UPDT_PT_F2_REQ :
+									r_TARGET_PAGE_ADDR = p_in_ctrl_data_0.read(); 
+									r_NEW_PAGE_ADDR = p_in_ctrl_data_1.read();
 									r_RAM_FSM = RAM_WIAM_UPDT;
 									break;
 							}
@@ -202,7 +203,7 @@ namespace caba {
 						DRAMCOUT(3) << name() << " [RAM_PAGE_TABLE_DIR_SAVE] " << endl;
 						DRAMCOUT(3) << name() << " page to invalidate " << hex << r_TARGET_PAGE_ADDR.read()  << endl;
 #ifndef NOCTRL
-						assert(p_ctrl_in_cmd.read() == CTRL_UPDT_PT_F1_REQ);
+						assert(p_in_ctrl_cmd.read() == MigControl::CTRL_UPDT_PT_F1_REQ);
 #endif
 						assert(check_page_access(r_TARGET_PAGE_ADDR.read()));
 						r_SAVE_PT_DIRECTORY = s_PT_DIRECTORY[ (r_TARGET_PAGE_ADDR.read() - m_segment.baseAddress()) >> m_PAGE_SHIFT ];
@@ -253,7 +254,7 @@ namespace caba {
 						if (r_SAVE_PT_DIRECTORY.Is_empty())
 						{
 #ifndef NOCTRL
-							if (p_ctrl_rsp_ack.read())
+							if (p_in_ctrl_rsp_ack.read())
 							{
 								r_PROCESSING_TLB_INV = false;
 								r_RAM_FSM = RAM_IDLE;
@@ -285,7 +286,7 @@ namespace caba {
 					assert((r_TARGET_PAGE_ADDR >> m_PAGE_SHIFT) < (m_segment.size()/PAGE_SIZE));
 					// if POISON_REQ set true, else if UNPOISON_REQ set false
 #ifndef NOCTRL
-					s_POISONNED[(r_TARGET_PAGE_ADDR >> m_PAGE_SHIFT)] = (p_ctrl_in_cmd.read() == CTRL_POISON_REQ);
+					s_POISONNED[(r_TARGET_PAGE_ADDR >> m_PAGE_SHIFT)] = (p_in_ctrl_cmd.read() == MigControl::CTRL_POISON_REQ);
 #endif
 					r_RAM_FSM = RAM_IDLE;
 				break;

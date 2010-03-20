@@ -66,7 +66,7 @@ namespace caba {
 	/***********************************************************************************************/
 	tmpl(bool)::check_page_access(typename vci_param::addr_t addr)
 	{
-		if (!((  ((addr - m_segment.baseAddress()) >> m_PAGE_SHIFT) < (m_segment.size()/PAGE_SIZE))))
+		if (!((  ((addr - m_segment.baseAddress() ) >> m_PAGE_SHIFT) < (m_segment.size()/PAGE_SIZE))))
 		{
 			std::cerr << name() << " [error] , accessing a page index out of range " << std::endl;
 			std::cerr << name() << "           home_entry    : " << std::hex << addr  << std::endl;
@@ -86,9 +86,13 @@ namespace caba {
 	tmpl(bool)::is_busy(void)
 	{
 #ifndef NOCTRL
-		return (p_ctrl_req.read());
+		return (p_in_ctrl_req.read());
+#else
+#ifdef DEADLOCK_NACK_POLICY
+		return (r_RAM_FSM != RAM_IDLE);
 #else
 		return false;
+#endif
 #endif
 	}
 
@@ -117,7 +121,12 @@ namespace caba {
 			m_last_write_nack = ! eop;
 			return false;
 		}
-		// the status (poison) of a page cannot change meanwhile
+#ifdef DEADLOCK_NACK_POLICY
+		if (r_RAM_FSM != RAM_IDLE)
+		{
+			return false;
+		}
+#endif
 		// a Write-burst is processed
 		assert(!m_last_write_nack);
 		assert(check_virtual_access(addr, node_id));
@@ -137,17 +146,23 @@ namespace caba {
 		m_sram_ce = true;
 		m_sram_bk = seg;
 
-		if (node_id == -1) return true; // the initiator does not support coherence (ex. fd_access).
-		if (s_DIRECTORY[blocknum].Is_Other(node_id) && eop )
+		if (((node_id == -1) && !s_DIRECTORY[blocknum].Is_empty())
+				|| ((node_id != -1) && s_DIRECTORY[blocknum].Is_Other(node_id)))
+		{
 			// Send invalidation only if it is the last cell of the paquet
 			// in order to avoid deadlocks, report to TODO point for an explanation 
-		{ 
 			r_RAM_FSM = RAM_DATA_INVAL;
 			r_SAV_ADDRESS = m_vci_fsm.getBase(seg)+addr;
 			r_SAV_SEGNUM = seg;
 			r_SAV_BLOCKNUM = blocknum;
 			r_SAV_SCRID = source_id;
 		}
+
+		m_counters_page_sel = page_index;
+		m_counters_cost++; // TODO, dynamic cost, for instance is paquet lenght!	
+		m_counters_enable = eop;	
+		m_counters_node_id = node_id;
+
 		return true;
 	}
 
@@ -189,6 +204,10 @@ namespace caba {
 		m_sram_ce = true;
 		m_sram_bk = seg;
 		
+		m_counters_page_sel = page_index;
+		m_counters_cost++; // TODO, dynamic cost, for instance is paquet lenght!	
+		m_counters_enable = eop;	
+		m_counters_node_id = node_id;
 
 		m_fsm_data = &data; // save the data location pointer, will be set in genMealy function.
 
