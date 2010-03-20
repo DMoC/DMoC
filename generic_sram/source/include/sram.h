@@ -88,6 +88,7 @@ namespace caba{
 				std::list<soclib::common::Segment>					* m_segment_list;    // A segment list 
 
 
+		public :
 				SRam (
 						sc_module_name insname,
 						std::list<soclib::common::Segment> * seg_list,
@@ -115,7 +116,6 @@ namespace caba{
 
 				void genMealy();
 
-			public :
 				typename sram_param::data_t read_write_sram(
 									typename sram_param::bk_t bank_sel,
 									typename sram_param::addr_t offset,
