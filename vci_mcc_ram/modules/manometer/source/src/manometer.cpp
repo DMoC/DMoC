@@ -180,6 +180,7 @@ namespace caba {
 				p_contention = false;
 				p_ack		 = true; // Accept requests
 				p_valid		 = false;
+				break;
 
 
 			case  MNTER_CONTENTION :

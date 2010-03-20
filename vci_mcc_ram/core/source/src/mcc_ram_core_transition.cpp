@@ -152,6 +152,7 @@ namespace caba {
 
 							switch(p_in_ctrl_cmd.read())
 							{
+								assert(false);
 								// TODO : acquiter la requête dans le moore de l'état atteint !
 								// r_PAGE_TO_POISON devrait être plutot une adresse pour "unifier" la com.
 								case MigControl::CTRL_POISON_REQ :

@@ -32,7 +32,7 @@
 #include <systemc>
 #include "mcc_globals.h"
 #include "caba_base_module.h"
-//#define DEBUG_COUNTERS
+#define DEBUG_COUNTERS
 #ifdef DEBUG_COUNTERS
 	#define D_COUNTERS_COUT cout
 #else
@@ -53,11 +53,12 @@ class Counters : public soclib::caba::BaseModule {
 		// some public types (or commands)
 		typedef sc_uint < 4 > cter_cmd_t; // up to 16 commands
 		enum cter_enum_cmd_e {
-			R_GLOBAL_COUNTER, // read a global counter [ page_idx ]
-			R_COUNTER,		  // read counter [ page_idx ] [ node_idx ]
-			R_ROUNDED_COUNTER,// read to rounded pow 2 counter [ page_idx ] [ node_idx ]
-			R_ID_MAX_PAGE,	  // read idx of max page
+			R_MAX_GLOBAL_COUNTER, // read a global counter [ page_idx ]
+			R_MAX_COUNTER,		  // read counter [ page_idx ] [ node_idx ]
+			R_MAX_ROUNDED_COUNTER,// read to rounded pow 2 counter [ page_idx ] [ node_idx ]
+			R_MAX_ID_PAGE,	  // read idx of max page
 			W_RESET_PAGE_CTER,  // reset counters [ page_idx ] [ all ]
+			ELECT,
 			NOP
 		};
 
@@ -76,15 +77,14 @@ class Counters : public soclib::caba::BaseModule {
 		// test if every thing is working fine
 
 		// Control interface
-#ifndef NO_CTRL
-		sc_in< bool >		p_req;	
-		sc_in< cter_cmd_t >	p_cmd;	
-		sc_in< sc_uint < 32 > > p_page_id;	
+		sc_in< bool >		p_ctrl_req;	
+		sc_in< cter_cmd_t >	p_ctrl_cmd;	
+		sc_in< sc_uint < 32 > > p_ctrl_page_id;	
+		sc_in< sc_uint<32> > p_ctrl_node_id; // TODO width can be reduced
 
-		sc_out< bool >		p_ack;	
-		sc_out< bool >		p_valid;	
-		sc_out< counter_t >	p_output;	
-#endif
+		sc_out< bool >		p_ctrl_ack;	
+		sc_out< bool >		p_ctrl_valid;	
+		sc_out< sc_uint < 32 > >	p_ctrl_output;	
 		
 
 		// ? interface
@@ -94,9 +94,10 @@ class Counters : public soclib::caba::BaseModule {
 		enum cter_fsm_state_e
 		{
 			CTER_IDLE,
-			CTER_COMPUTING,
-			CTER_READ,
-			CTER_WRITE,
+			CTER_SAVE,		// Save counters value when threshold is reached
+			CTER_COMPUTING, // Compute counter incremet
+			CTER_SEND_RSP,  // Send response to ctrl
+			CTER_WRITE, 	// Unused
 			CTER_WAIT
 		};
 
@@ -121,6 +122,14 @@ class Counters : public soclib::caba::BaseModule {
 		sc_signal < counter_t >  * d_global_counters; // Debug/stats only, One per page
 		sc_signal < unsigned int > r_max_page; // index of most accessed page
 		sc_signal < unsigned int > r_index_p;  // 
+
+		// saved valued on threashold :
+		sc_signal < unsigned int > r_out_max_p; 
+		sc_signal < counter_t >    r_out_global_counter;
+		sc_signal < counter_t >  * r_out_counter; 
+
+		// returned value on a read :
+		sc_signal < sc_uint < 32 > > r_out_value;  // 
 
 		sc_signal < bool >	r_raise_threshold;  // TODO
 		bool				m_raise_threshold;

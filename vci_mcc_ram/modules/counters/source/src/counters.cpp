@@ -89,6 +89,7 @@ Counters::Counters(sc_module_name insname,unsigned int nb_nodes,unsigned int nb_
 		r_global_counters = new sc_signal< counter_t > [m_NB_PAGES];
 		d_global_counters = new sc_signal< counter_t > [m_NB_PAGES];
 
+		r_out_counter = new sc_signal< counter_t > [m_NB_NODES];
 
 		for(unsigned int i = 0; i < m_NB_PAGES ; i++){
 			r_counters[i] = new  sc_signal< counter_t >  [m_NB_NODES];
@@ -152,6 +153,7 @@ Counters::~Counters(){
 	delete [] r_counters;
 	delete [] d_global_counters;
 	delete [] r_global_counters;
+	delete [] r_out_counter;
 	
 }
 

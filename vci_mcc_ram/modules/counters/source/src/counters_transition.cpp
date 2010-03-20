@@ -46,13 +46,11 @@ namespace caba {
 	{
 		const bool			p_in_enable		= p_enable.read();
 
-		const unsigned int	p_in_node_id	= p_node_id.read();
+		const unsigned int	p_in_node_id	= p_ctrl_node_id.read();
 	
-#ifndef NO_CTRL
-		const bool			p_in_req		= p_req.read();
-		const cter_cmd_t	p_in_cmd		= p_cmd.read();
-		const unsigned int	p_in_page_id	= p_page_id.read();
-#endif
+		const bool			p_in_req		= p_ctrl_req.read();
+		const cter_cmd_t	p_in_cmd		= p_ctrl_cmd.read();
+		const unsigned int	p_in_page_id	= p_ctrl_page_id.read();
 
 #if 0
 		const bool p_in_freeze				= p_freeze.read();
@@ -73,28 +71,55 @@ namespace caba {
 			r_index_p = 0;
 			r_raise_threshold = false;
 			m_raise_threshold = false;
-			std::cout << name() <<  "counters raise contention!" << std::endl;
 			r_CTER_FSM = CTER_IDLE;
-			D_COUNTERS_COUT << " reset done  " << endl;
+			D_COUNTERS_COUT << name() << " reset done  " << endl;
 			return;
 		}	
 
 		switch ((cter_fsm_state_e) r_CTER_FSM.read())
 		{
+			case CTER_SEND_RSP :
+				r_CTER_FSM = CTER_IDLE;
+			break;
+
 			case CTER_IDLE :
 				r_raise_threshold = false;
-#ifndef NO_CTRL
 				if (p_in_req) // If a command request (read, write etc)
 				{
 					switch ( p_in_cmd )
 					{
+						case R_MAX_GLOBAL_COUNTER :
+							r_out_value = (sc_uint <32> )r_out_global_counter.read();	
+							r_CTER_FSM = CTER_SEND_RSP;
+							break;
+						case R_MAX_COUNTER :
+							assert(p_ctrl_node_id.read() < m_NB_NODES);
+							r_out_value = (sc_uint <32> )r_out_counter[p_ctrl_node_id.read()].read();	
+							r_CTER_FSM = CTER_SEND_RSP;
+							break;
+						case R_MAX_ROUNDED_COUNTER :
+							assert(p_ctrl_node_id.read() < m_NB_NODES);
+							r_out_value = (sc_uint <32> )uint32_log2((unsigned int)r_out_counter[p_ctrl_node_id.read()].read());	
+							r_CTER_FSM = CTER_SEND_RSP;
+							break;
+						case R_MAX_ID_PAGE :
+							r_CTER_FSM = CTER_SEND_RSP;
+							r_out_value = (sc_uint <32> )r_out_max_p;
+							break;
+						case W_RESET_PAGE_CTER :
+						case NOP :
+							assert(false);
+						case ELECT :
+							r_CTER_FSM = CTER_SEND_RSP;
+							r_out_value = (sc_uint <32> )evict_sel();
+							break;
+						break;
 						default :
 							assert(false);
 							break;
 					}
 				}
-#endif
-
+				else
 				if (p_in_enable) // Else, compute any access to a page
 				{
 					if (!(p_in_node_id < m_NB_NODES))
@@ -115,6 +140,7 @@ namespace caba {
 
 			case CTER_COMPUTING :
 				{
+
 					const unsigned int	p = r_save_page_sel;
 					const unsigned int	n = r_save_node_id;
 					const counter_t		c = r_save_cost; 
@@ -124,12 +150,18 @@ namespace caba {
 					assert(p < m_NB_PAGES);
 					assert(max_p < m_NB_PAGES);
 
+					// Computation takes 
+					if (m_COMPUTE_TIME != 0)
+					{
+						m_COMPUTE_TIME--;
+						break;
+					}
 					// Only compute page access for processor modules
 					// This may introduce error in top3 since contention may appear (module_8) due to
 					// heavy DMA acces to pages not acccessed by a processor
-					D_COUNTERS_COUT <<  name() << " p_in_page_sel->" << r_save_page_sel
-									<< " p_in_node_id->" << r_save_node_id
-									<< " p_in_cost->" << r_save_cost <<  endl;
+					//D_COUNTERS_COUT <<  name() << " p_in_page_sel->" << r_save_page_sel
+					//				<< " p_in_node_id->" << r_save_node_id
+					//				<< " p_in_cost->" << r_save_cost <<  endl;
 					{
 						// some check
 						counter_t sum = 0;
@@ -165,24 +197,40 @@ namespace caba {
 #else
 						if (r_counters[p][n] M9_COMP_OP PE_PERIOD) m_raise_threshold = true;
 #endif
+						if (m_raise_threshold == true) {
+							D_COUNTERS_COUT << name() << " PE mig at  "<< std::dec << r_counters[p][n] << endl;
+							r_out_max_p = p;
+							r_out_global_counter = r_global_counters[p] + c;
+							m_COMPUTE_TIME = m_NB_NODES;
+							r_CTER_FSM = CTER_SAVE;
+							r_raise_threshold = m_raise_threshold;
+							m_raise_threshold = false;
+						}
 
-						D_COUNTERS_COUT << name() << "page->" << p << " value->" << r_global_counters[p] << endl;
+						//D_COUNTERS_COUT << name() << "page->" << p << " value->" << r_global_counters[p] << endl;
 					}
+					m_COMPUTE_TIME = CPT_TIME;
+					r_CTER_FSM = CTER_IDLE;
+				}
+				break;
 
+			case CTER_SAVE :
+				{
+					const unsigned int	p = r_save_page_sel;
 					// Computation takes 
 					if (m_COMPUTE_TIME != 0)
 					{
 						m_COMPUTE_TIME--;
+						break;
 					}
-					else
+					for (unsigned int j = 0; j < m_NB_NODES; j++)
 					{
-						m_COMPUTE_TIME = CPT_TIME;
-						r_CTER_FSM = CTER_IDLE;
-						r_raise_threshold = m_raise_threshold;
-						m_raise_threshold = false;
+						r_out_counter[j] = r_counters[p][j];
 					}
+					m_COMPUTE_TIME = CPT_TIME;
+					r_CTER_FSM = CTER_IDLE;
 				}
-				break;
+			break;
 
 			default :
 				assert(false);

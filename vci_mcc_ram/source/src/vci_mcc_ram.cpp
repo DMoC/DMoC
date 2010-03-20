@@ -164,6 +164,7 @@ namespace caba {
 		c_mig_control -> p_out_counters_req(s_req_ctrl2counters);
 		c_mig_control -> p_out_counters_cmd(s_cmd_ctrl2counters);
 		c_mig_control -> p_out_counters_page_id(s_pid_ctrl2counters);
+		c_mig_control -> p_out_counters_node_id(s_nid_ctrl2counters);
 
 		c_mig_control -> p_in_counters_ack(s_ack_counters2ctrl);
 		c_mig_control -> p_in_counters_valid(s_valid_counters2ctrl);
@@ -203,12 +204,13 @@ namespace caba {
 
 		c_counters -> p_contention(s_contention_counters2ctrl);	
 
-		c_counters -> p_req(s_req_ctrl2counters);
-		c_counters -> p_cmd(s_cmd_ctrl2counters);
-		c_counters -> p_page_id(s_pid_ctrl2counters);
-		c_counters -> p_ack(s_ack_counters2ctrl);	
-		c_counters -> p_valid(s_valid_counters2ctrl);
-		c_counters -> p_output(s_output_counters2ctrl);
+		c_counters -> p_ctrl_req(s_req_ctrl2counters);
+		c_counters -> p_ctrl_cmd(s_cmd_ctrl2counters);
+		c_counters -> p_ctrl_page_id(s_pid_ctrl2counters);
+		c_counters -> p_ctrl_node_id(s_nid_ctrl2counters);
+		c_counters -> p_ctrl_ack(s_ack_counters2ctrl);	
+		c_counters -> p_ctrl_valid(s_valid_counters2ctrl);
+		c_counters -> p_ctrl_output(s_output_counters2ctrl);
 
 
 		SC_METHOD (Transition);

@@ -119,10 +119,11 @@ namespace caba{
 				sc_signal < bool > s_req_ctrl2counters;
 				sc_signal < Counters::cter_cmd_t > s_cmd_ctrl2counters;
 				sc_signal < sc_uint < 32 > > s_pid_ctrl2counters;
+				sc_signal < sc_uint < 32 > > s_nid_ctrl2counters;
 
 				sc_signal < bool > s_ack_counters2ctrl;
 				sc_signal < bool > s_valid_counters2ctrl;
-				sc_signal < counter_t > s_output_counters2ctrl;
+				sc_signal < sc_uint < 32 > > s_output_counters2ctrl;
 		
 				// TODO : type harmonization
 
