@@ -398,6 +398,11 @@ tmpl(void)::transition()
 									dcache_rsp_port.valid = true;
 									dcache_rsp_port.rdata = 0;
 									break;
+                case iss_t::XTN_DCACHE_INVAL : // Cache invalidate
+									dcache_rsp_port.valid = true;
+									dcache_rsp_port.rdata = 0;
+                  if (dcache_hit) r_DCACHE_FSM = DCACHE_CPUINVAL; 
+                  break;
 								default : 
 									assert(false);
 									break;
