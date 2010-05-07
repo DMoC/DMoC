@@ -184,8 +184,6 @@ class MigControl : public soclib::caba::BaseModule {
 
 		enum fsm_c_state_e{
 			c_idle,
-			c_access_counters,
-			c_access_value,
 			c_elect,
 			c_elect_wait,
 			c_abort

@@ -45,6 +45,7 @@ Counters::Counters(sc_module_name insname,unsigned int nb_nodes,unsigned int nb_
 	r_max_page("max_page"),
 	r_index_p("index_p"),
 	r_raise_threshold("raise_threshold"),
+	r_stall_input("stall_input"),
 	m_raise_threshold(false),
 	r_save_page_sel("save_page_sel"),
 	r_save_node_id("save_node_id"),
@@ -54,6 +55,7 @@ Counters::Counters(sc_module_name insname,unsigned int nb_nodes,unsigned int nb_
 	m_NB_PAGES(nb_pages),
 	m_NB_NODES(nb_nodes),
 	m_COMPUTE_TIME(0),
+	m_ABORT_TIME(0),
 
 	m_ADDR_NCOUNT_PSEL_SHIFT(uint32_log2(m_NB_NODES)+uint32_log2(sizeof(counter_t))),
 	m_ADDR_NCOUNT_PSEL_MASK((m_NB_PAGES-1) << m_ADDR_NCOUNT_PSEL_SHIFT),

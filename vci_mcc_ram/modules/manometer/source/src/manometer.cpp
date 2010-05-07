@@ -202,6 +202,11 @@ namespace caba {
 				p_valid		 = false; // ouput value
 			break;
 
+			case  MNTER_RESET :
+				p_contention = false;
+				p_ack				 = false;
+				p_valid			 = false; // ouput value
+			break;
 			default :
 				assert(false);
 				break;

@@ -61,6 +61,8 @@ namespace soclib {
 				case t_idle :
 					break;
 				case t_register :
+					// todo : ack of the incomming request
+					assert(false);
 					break;
 			}
 
@@ -71,11 +73,13 @@ namespace soclib {
 					p_out_manometer_contention_ack = true;
 					p_out_manometer_cmd = Manometer::MNTER_CMD_NOP; 
 					break;
+
 				case m_raise_contention :
 					p_out_manometer_req = false;
 					p_out_manometer_contention_ack = true;
 					p_out_manometer_cmd = Manometer::MNTER_CMD_NOP; 
 					break;
+
 				case m_abort :
 					p_out_manometer_req = true;
 					p_out_manometer_contention_ack = false;
@@ -124,41 +128,27 @@ namespace soclib {
 					p_out_counters_node_id = 0xDEADDEAD;
 					break;
 
-				case c_access_counters :
+				case c_abort :
 					p_out_counters_req = true;
-					p_out_counters_cmd = Counters::R_MAX_ID_PAGE;
+					p_out_counters_cmd = Counters::W_ABORT;
 					p_out_counters_page_id = 0xDEADDEAD;
 					p_out_counters_node_id = 0xDEADDEAD;
-					assert(false);
-					break;
-
-				case c_access_value :
-					p_out_counters_req = true;
-					p_out_counters_cmd = Counters::R_MAX_ROUNDED_COUNTER;
-					p_out_counters_page_id = 0xDEADDEAD;
-					p_out_counters_node_id = 0xDEADDEAD;
-					assert(false);
 					break;
 
 				case c_elect :
-					p_out_counters_req = true;
-					p_out_counters_cmd = Counters::ELECT;
-					p_out_counters_page_id = 0xDEADDEAD;
-					p_out_counters_node_id = 0xDEADDEAD;
-					break;
-				case c_elect_wait :
 					p_out_counters_req = false;
 					p_out_counters_cmd = Counters::NOP;
 					p_out_counters_page_id = 0xDEADDEAD;
 					p_out_counters_node_id = 0xDEADDEAD;
 					break;
-				case c_abort :
+
+				case c_elect_wait :
 					p_out_counters_req = true;
-					p_out_counters_cmd = Counters::W_RESET_PAGE_CTER;
+					p_out_counters_cmd = Counters::ELECT;
 					p_out_counters_page_id = 0xDEADDEAD;
 					p_out_counters_node_id = 0xDEADDEAD;
-					assert(false);
 					break;
+
 			}
 		}
 

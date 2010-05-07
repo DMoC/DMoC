@@ -57,7 +57,7 @@ class Counters : public soclib::caba::BaseModule {
 			R_MAX_COUNTER,		  // read counter [ page_idx ] [ node_idx ]
 			R_MAX_ROUNDED_COUNTER,// read to rounded pow 2 counter [ page_idx ] [ node_idx ]
 			R_MAX_ID_PAGE,	  // read idx of max page
-			W_RESET_PAGE_CTER,  // reset counters [ page_idx ] [ all ]
+			W_ABORT,
 			ELECT,
 			NOP
 		};
@@ -94,11 +94,11 @@ class Counters : public soclib::caba::BaseModule {
 		enum cter_fsm_state_e
 		{
 			CTER_IDLE,
-			CTER_SAVE,		// Save counters value when threshold is reached
 			CTER_COMPUTING, // Compute counter incremet
 			CTER_SEND_RSP,  // Send response to ctrl
 			CTER_WRITE, 	// Unused
-			CTER_WAIT
+			CTER_WAIT,
+			CTER_ABORT
 		};
 
 	public :
@@ -132,6 +132,7 @@ class Counters : public soclib::caba::BaseModule {
 		sc_signal < sc_uint < 32 > > r_out_value;  // 
 
 		sc_signal < bool >	r_raise_threshold;  // TODO
+		sc_signal < bool >	r_stall_input;  // TODO
 		bool				m_raise_threshold;
 
 		// Save a request :
@@ -148,6 +149,7 @@ class Counters : public soclib::caba::BaseModule {
 		unsigned int m_NB_PAGES;
 		unsigned int m_NB_NODES;
 		unsigned int m_COMPUTE_TIME;
+		unsigned int m_ABORT_TIME;
 		unsigned int m_cycles_simu;
 
 		// On a basis of 128 nodes, 0x8000 pages, 16bits per counter, 32 bits per id

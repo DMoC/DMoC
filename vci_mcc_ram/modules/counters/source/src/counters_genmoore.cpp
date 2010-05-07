@@ -43,6 +43,7 @@ void Counters::genMoore( void ){
 			p_ctrl_valid = false;	
 			break;
 
+
 		case CTER_SEND_RSP :
 			p_contention = false; 
 			p_ctrl_output = r_out_value.read();; 
@@ -51,6 +52,7 @@ void Counters::genMoore( void ){
 			break;
 
 		case CTER_COMPUTING :
+		case CTER_ABORT :
 			p_contention = false; 
 			p_ctrl_output = 0; 
 			p_ctrl_ack = false;	

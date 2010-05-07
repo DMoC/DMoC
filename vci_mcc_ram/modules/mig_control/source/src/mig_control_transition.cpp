@@ -42,7 +42,6 @@ namespace soclib {
 		void MigControl::transition( void )
 		{
 			if(!p_resetn.read()){
-				cout << name() << " <<<< reseting >>>> " << std::endl;
 				d_cycles = 0;
 
 				r_disable_contention_raise = false;
@@ -126,20 +125,20 @@ namespace soclib {
 					if((p_in_manometer_contention.read() || (p_in_counters_contention.read())) && !r_master_transaction && !r_slave_transaction )
 					{
 
-					D10COUT(0) << name() << " contention detected " << std::endl;
-					if (p_in_manometer_contention.read()) {
-						D10COUT(0) << name() << " > manometer " << std::endl;
-					}
-					if (p_in_counters_contention.read()) {
-						D10COUT(0) << name() << " > counters " << std::endl;
-					}
+						D10COUT(0) << name() << " contention detected " << std::endl;
+						if (p_in_manometer_contention.read()) {
+							D10COUT(0) << name() << " > manometer " << std::endl;
+						}
+						if (p_in_counters_contention.read()) {
+							D10COUT(0) << name() << " > counters " << std::endl;
+						}
 #ifdef USE_STATS
 						if (p_in_manometer_contention.read()) { stats.c_mig++; }
 						if (p_in_counters_contention.read()) { stats.e_mig++; }
 #endif
 						r_MIG_M_CTRL_FSM = m_raise_contention; 
 					}
-					if (r_todo_board[ CMD_ABORT ] == true){
+					else if (r_todo_board[ CMD_ABORT ] == true){
 								r_MIG_M_CTRL_FSM = m_abort;
 					}
 					break;
@@ -158,14 +157,13 @@ namespace soclib {
 					D10COUT(0) << name() << " ack .. going back idle " << std::endl;
 					r_MIG_M_CTRL_FSM = m_idle;
 					r_master_transaction = true; 
-					r_todo_board[CMD_ELECT] = true; // HACK 
 #endif
 					break;
 
 
 				case m_abort :
 					assert(false);
-					// Moore : send a reset signal to counters and manometer, wait for ack
+					// Moore : send a reset signal to manometer, wait for ack
 #if 0
 					if (p_in_counters_ack.read()){ // Reset command was accepted
 						r_MIG_M_CTRL_FSM =  m_idle;
@@ -203,7 +201,7 @@ namespace soclib {
 					if (p_in_counters_valid.read() && p_in_counters_ack.read()){
 						r_slave_transaction = true;
 						r_c_elect_p = p_in_counters_output.read(); 
-						D10COUT(0) << name() << " > received elected page " << std::endl;
+						D10COUT(0) << name() << " > received elected page " << p_in_counters_output.read() << std::endl;
 						r_MIG_C_CTRL_FSM = c_idle;
 					}
 #if 0
