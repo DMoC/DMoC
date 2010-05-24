@@ -1,0 +1,9 @@
+
+# -*- python -*-
+
+Module('caba:globals_sls',
+	header_files = ['../source/include/globals.h',],
+	uses = [
+		Uses('caba:micro_ring_param_sls'),
+	],
+)

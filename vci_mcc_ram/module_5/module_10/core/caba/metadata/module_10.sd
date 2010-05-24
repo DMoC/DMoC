@@ -1,0 +1,15 @@
+
+# -*- python -*-
+
+Module('caba:module_10_sls',
+	classname = 'soclib::caba::Module_10',
+	header_files = ['../source/include/module_10.h',],
+	implementation_files = ['../source/src/module_10.cpp',],
+	uses = [
+		Uses('caba:globals_sls'),
+		Uses('caba:module_6_sls'),
+		Uses('caba:module_7_sls'),
+		Uses('caba:module_9_sls'),
+		Uses('caba:module_8_sls'),
+	],
+)
