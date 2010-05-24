@@ -9,26 +9,7 @@ Utilisation dans le sc_no_RingSignal de types
 systemC!
 
 
-notes :
-
-vci_mcc_ram -> version "tlb du target fsm".
-version "tlb du target fsm" -> "version mcc du linked access buffer" 
-
-
-Mercredi soir : 
--> connecter le module de migration
--> tester compléter le module de migration
-
-Jeudi soir : 
--> faire wrapper d'accès à la ram
-
-Semaine de vacance : 
--> module de migration
--> ring d'interconnexion
-
-3 ème semaine de mars :
--> intégration
-
-4 ème semaine de mars :
--> test et debug
+A virer : ONE_SEG_MODE
+A virer : TOP_P et TOP_N
+A virer : COMPUTE_TOP_CYCLES
 

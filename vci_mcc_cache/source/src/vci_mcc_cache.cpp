@@ -42,7 +42,7 @@
 #include "arithmetics.h"
 #include "alloc_elems.h"
 #include "vci_mcc_cache.h"
-#include "mcc_globals.h" // utilisé pour connaitre la taille des pages du système 
+#include "globals.h" // utilisé pour connaitre la taille des pages du système 
 
 #ifdef CDB_COMPONENT_IF_H
 #include <stdlib.h> // related to CDB (strtoul)
